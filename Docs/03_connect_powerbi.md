@@ -13,7 +13,8 @@ Use **Import**, not DirectQuery — DirectQuery against BigQuery has documented 
 | `fact_events` | ✅ | Core event-grain fact |
 | `fact_event_items` | ✅ | Item-grain fact, for ecommerce pages |
 | `fact_sessions` | ✅ | Session-grain fact |
-| `dim_date`, `dim_device`, `dim_geo`, `dim_traffic_source`, `dim_app_info`, `dim_item`, `dim_user` | ✅ | All dimensions |
+| `dim_date`, `dim_device`, `dim_geo`, `dim_traffic_source`, `dim_item`, `dim_user` | ✅ | Dimensions |
+| `dim_app_info` | ⚠️ App properties only | Empty for web-only properties (including the sample dataset) — skip it and its relationship. See `Docs/02_transformation_pipeline.md`. |
 | `bridge_event_params` | ❌ | Full-fidelity audit/completeness table (millions of rows) — exists for warehouse completeness, not for dashboard use. Importing this will bloat the .pbix significantly for no reporting benefit. |
 | `bridge_user_properties` | ❌ | Same reasoning as above |
 
@@ -25,7 +26,7 @@ Use **Import**, not DirectQuery — DirectQuery against BigQuery has documented 
 | `fact_events` | `device_key` | `dim_device` | `device_key` |
 | `fact_events` | `geo_key` | `dim_geo` | `geo_key` |
 | `fact_events` | `traffic_source_key` | `dim_traffic_source` | `traffic_source_key` |
-| `fact_events` | `app_info_key` | `dim_app_info` | `app_info_key` |
+| `fact_events` | `app_info_key` | `dim_app_info` | `app_info_key` *(app properties only)* |
 | `fact_events` | `user_key` | `dim_user` | `user_key` |
 | `fact_sessions` | `date_key` | `dim_date` | `date_key` |
 | `fact_sessions` | `device_key` | `dim_device` | `device_key` |
@@ -36,9 +37,10 @@ Use **Import**, not DirectQuery — DirectQuery against BigQuery has documented 
 
 **Rules:**
 - Every relationship: cardinality = **Many-to-one**, cross-filter direction = **Single**.
+- Every dimension must have exactly one row per key. If Power BI offers only Many-to-many, or reports duplicate values in the key column, run the checks at the bottom of `BigQuery/03_backfill.sql` — they show which dimension has duplicate keys.
 - **No relationship between `fact_events`, `fact_sessions`, and `fact_event_items`** — all three connect independently to shared dimensions instead (see `Docs/02_transformation_pipeline.md` for why).
 - Mark `dim_date` as the model's official **Date Table** (Modeling tab → Mark as Date Table) to enable built-in time-intelligence functions.
 
 ## Refresh schedule
 
-Set a scheduled refresh in the Power BI Service matching the pipeline's daily cadence (see `SQL/04_daily_incremental_load.sql`), timed after the scheduled query typically completes for the day.
+Set a scheduled refresh in the Power BI Service matching the pipeline's daily cadence (see `Refresh Schedule/04_daily_incremental_load.sql`), timed after the scheduled query typically completes for the day.

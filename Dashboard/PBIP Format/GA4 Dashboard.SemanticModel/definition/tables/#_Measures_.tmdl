@@ -1,0 +1,633 @@
+table #_Measures_
+	lineageTag: be05c863-c494-4a19-ada4-ccf8a1348cfa
+
+	measure 'Total users' = DISTINCTCOUNT ( fact_events[user_key] )
+		formatString: #,0
+		displayFolder: User Acquisition\Base
+		lineageTag: d9a6ab74-9a28-443e-a106-f613928e4bf9
+
+	measure 'New users' =
+			CALCULATE (
+			    DISTINCTCOUNT ( fact_events[user_key] ),
+			    fact_events[event_name] IN { "first_visit", "first_open" }
+			)
+		formatString: #,0
+		displayFolder: User Acquisition\Base
+		lineageTag: dfbe613b-78b7-4e28-9c9f-805381298a01
+
+	measure Sessions = COUNTROWS ( fact_sessions )
+		formatString: #,0
+		displayFolder: User Acquisition\Base
+		lineageTag: b40c4403-c5dd-4b96-860c-ed5140c02539
+
+	measure 'Ecommerce purchases' =
+			CALCULATE (
+			    COUNTROWS ( fact_events ),
+			    fact_events[event_name] = "purchase"
+			)
+		formatString: #,0
+		displayFolder: User Acquisition\Base
+		lineageTag: bc19f75b-3bf2-4a5f-98e8-74353c063acf
+
+	measure 'Purchase revenue' = SUM ( fact_events[purchase_revenue_in_usd] )
+		formatString: \$#,0.00
+		displayFolder: User Acquisition\Base
+		lineageTag: 3298ab7a-5747-4fd0-a4c4-62d3e3d396f3
+
+	measure ECVR = DIVIDE ( [Ecommerce purchases], [Sessions] )
+		formatString: 0.00%
+		displayFolder: User Acquisition\Base
+		lineageTag: 3d447204-4598-44a3-9baa-51431ce93e01
+
+	measure '% of Users' =
+			DIVIDE (
+			    [Total users],
+			    CALCULATE ( [Total users], ALLSELECTED ( dim_traffic_source ) )
+			)
+		formatString: 0.00%
+		displayFolder: User Acquisition\Share of total
+		lineageTag: cd615eb9-8246-4d65-a498-219a2e273a87
+
+	measure '% New Users' =
+			DIVIDE (
+			    [New users],
+			    CALCULATE ( [New users], ALLSELECTED ( dim_traffic_source ) )
+			)
+		formatString: 0.00%
+		displayFolder: User Acquisition\Share of total
+		lineageTag: 43512097-e8fd-4e82-bb22-fbc4e93a6e9e
+
+	measure '% Revenue' =
+			DIVIDE (
+			    [Purchase revenue],
+			    CALCULATE ( [Purchase revenue], ALLSELECTED ( dim_traffic_source ) )
+			)
+		formatString: 0.00%
+		displayFolder: User Acquisition\Share of total
+		lineageTag: 7ed77bf6-3884-42e6-ac05-2a3039aba8ea
+
+	measure 'KPI Value' =
+			SWITCH (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			    0, [Total users],
+			    1, [New users],
+			    2, [Ecommerce purchases],
+			    3, [ECVR],
+			    4, [Purchase revenue]
+			)
+		displayFolder: User Acquisition\KPI Selector
+		lineageTag: 0c070b45-939b-45d8-bd3d-eaefd78706d7
+
+		formatStringDefinition =
+				SWITCH (
+				    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				    3, "0.00%",
+				    4, "\$#,0",
+				    "#,0"
+				)
+
+	measure 'KPI Delta' =
+			SWITCH (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			    0, [Total users Change %],
+			    1, [New users Change %],
+			    2, [Ecommerce purchases Change %],
+			    3, [ECVR Change %],
+			    4, [Purchase revenue Change %]
+			)
+		formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+		displayFolder: User Acquisition\KPI Selector
+		lineageTag: 5fb0fc38-892a-44ef-a9fd-a3bad98f9589
+
+	measure 'KPI Chart Title' =
+			"Daily " & SWITCH (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			    0, "total users",
+			    1, "new users",
+			    2, "ecommerce purchases",
+			    3, "ECVR",
+			    4, "purchase revenue",
+			    "KPIs"
+			)
+		displayFolder: User Acquisition\KPI Selector
+		lineageTag: 0f461d90-8eaa-4366-b296-98e53ec0b80e
+
+	measure 'KPI Card SVG' =
+			VAR _KPIOrder =
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] )
+			VAR _KPIName =
+			    SWITCH (
+			        _KPIOrder,
+			        0, "Total users",
+			        1, "New users",
+			        2, "Ecommerce purchases",
+			        3, "ECVR",
+			        4, "Purchase revenue",
+			        "KPI"
+			    )
+			VAR _KPIValue = [KPI Value]
+			VAR _KPIDelta = [KPI Delta]
+			VAR _FormattedValue =
+			    SWITCH (
+			        _KPIOrder,
+			        0, FORMAT ( _KPIValue, "#,##0" ),
+			        1, FORMAT ( _KPIValue, "#,##0" ),
+			        2, FORMAT ( _KPIValue, "#,##0" ),
+			        3, FORMAT ( _KPIValue, "0.00%" ),
+			        4, FORMAT ( _KPIValue, "$#,##0.00" ),
+			        FORMAT ( _KPIValue, "#,##0.##" )
+			    )
+			VAR _FormattedValueEncoded = SUBSTITUTE ( _FormattedValue, "%", "%25" )
+			VAR _FormattedDelta = FORMAT ( _KPIDelta, "+0.0%;-0.0%;0.0%" )
+			VAR _DeltaRaw =
+			    IF ( ISBLANK ( _KPIDelta ), "No comparison available", _FormattedDelta )
+			VAR _DeltaTextEncoded =
+			    SUBSTITUTE (
+			        SUBSTITUTE (
+			            SUBSTITUTE ( _DeltaRaw, "%", "%25" ),
+			            "+", "%2B"
+			        ),
+			        " ", "%20"
+			    )
+			VAR _DeltaColor =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _KPIDelta ), "%2364778F",
+			        _KPIDelta > 0, "%230057CE",
+			        _KPIDelta < 0, "%23D51A9F",
+			        "%2364778F"
+			    )
+			VAR _DeltaFill =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _KPIDelta ), "%23F3F6FA",
+			        _KPIDelta > 0, "%23EAF2FF",
+			        _KPIDelta < 0, "%23FCEAF5",
+			        "%23F3F6FA"
+			    )
+			VAR _DeltaArrow =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _KPIDelta ), "",
+			        _KPIDelta > 0, "&#9650;",
+			        _KPIDelta < 0, "&#9660;",
+			        "&#8212;"
+			    )
+			VAR _DeltaDisplay =
+			    IF ( _DeltaArrow = "", _DeltaTextEncoded, _DeltaArrow & "%20" & _DeltaTextEncoded )
+			VAR _SVG =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 180 100' display='block'>"
+			        & "<rect x='1' y='1' width='178' height='98' rx='7' fill='%23FFFFFF'/>"
+			        & "<text x='12' y='27' font-family='Segoe UI,Arial,sans-serif' font-size='13' font-weight='500' fill='%2364778F'>"
+			        & _KPIName
+			        & "</text>"
+			        & "<text x='12' y='57' font-family='Segoe UI,Arial,sans-serif' font-size='22' font-weight='600' fill='%23041225'>"
+			        & _FormattedValueEncoded
+			        & "</text>"
+			        & "<rect x='10' y='68' width='160' height='22' rx='5' fill='" & _DeltaFill & "'/>"
+			        & "<text x='90' y='84' text-anchor='middle' font-family='Segoe UI,Arial,sans-serif' font-size='13' font-weight='600' fill='" & _DeltaColor & "'>"
+			        & _DeltaDisplay
+			        & "</text>"
+			        & "</svg>"
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			        "data:image/svg+xml;charset=utf-8," & _SVG,
+			        BLANK ()
+			    )
+		lineageTag: ae5cf1d5-9f82-4e82-8527-7e46bdff8a93
+		dataCategory: ImageUrl
+
+	measure '</> Slicer Filter' = ```
+			INT( NOT ISEMPTY( fact_sessions ) )    // replace it with your own fact table
+			
+			```
+		formatString: 0
+		lineageTag: 8f598c12-6270-48a8-b944-02737b969db0
+
+	/// First day of the range selected in the date slicer (read even inside a daily axis).
+	measure 'Period Start' = CALCULATE ( MIN ( dim_date[date_key] ), ALLSELECTED ( dim_date ) )
+		formatString: d mmm yyyy
+		displayFolder: Period comparison\Helpers
+		lineageTag: 92ae01cc-0d28-43b2-beb4-92b4e8615bef
+
+	/// Last day of the range selected in the date slicer.
+	measure 'Period End' = CALCULATE ( MAX ( dim_date[date_key] ), ALLSELECTED ( dim_date ) )
+		formatString: d mmm yyyy
+		displayFolder: Period comparison\Helpers
+		lineageTag: fe74defa-7528-4d03-bae7-c62aa8aa59b2
+
+	measure 'Period Days' = DATEDIFF ( [Period Start], [Period End], DAY ) + 1
+		formatString: 0
+		displayFolder: Period comparison\Helpers
+		lineageTag: 8509434a-e47c-4469-a372-f4adb1a6d3d6
+
+	/// Previous period = the same number of days immediately before the selected range.
+	measure 'Comparison Start' = [Period Start] - [Period Days]
+		formatString: d mmm yyyy
+		displayFolder: Period comparison\Helpers
+		lineageTag: 71b38b9f-f0d1-46ce-9d59-811bd778cb69
+
+	measure 'Comparison End' = [Period Start] - 1
+		formatString: d mmm yyyy
+		displayFolder: Period comparison\Helpers
+		lineageTag: 72513ba5-c04a-4713-ab14-7bf84f0e385e
+
+	measure 'Comparison Caption' = "vs. previous period"
+		displayFolder: Period comparison\Helpers
+		lineageTag: ecf24aa9-7094-496e-9071-0dbb0b3a3da3
+
+	measure 'Period Range Label' = FORMAT ( [Period Start], "d mmm yyyy" ) & " – " & FORMAT ( [Period End], "d mmm yyyy" )
+		displayFolder: Period comparison\Helpers
+		lineageTag: 2cf78dff-60fb-4655-ae9b-0e503313fcaf
+
+	measure 'Comparison Range Label' = FORMAT ( [Comparison Start], "d mmm yyyy" ) & " – " & FORMAT ( [Comparison End], "d mmm yyyy" )
+		displayFolder: Period comparison\Helpers
+		lineageTag: 29ad17ee-9593-4e4b-b7be-694c31c03e53
+
+	/// Previous period = same number of days immediately before the slicer range. Blank if that window starts before the first day of data.
+	measure 'Total users (Comparison)' =
+			VAR _start = [Comparison Start]
+			VAR _end   = [Comparison End]
+			RETURN
+			    IF (
+			        _start >= [First Data Date],
+			        CALCULATE (
+			            [Total users],
+			            REMOVEFILTERS ( dim_date ),
+			            DATESBETWEEN ( dim_date[date_key], _start, _end )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Period comparison\Previous period
+		lineageTag: b4b6ae36-fe16-437c-a6cc-140a7b034f2a
+
+	measure 'New users (Comparison)' =
+			VAR _start = [Comparison Start]
+			VAR _end   = [Comparison End]
+			RETURN
+			    IF (
+			        _start >= [First Data Date],
+			        CALCULATE (
+			            [New users],
+			            REMOVEFILTERS ( dim_date ),
+			            DATESBETWEEN ( dim_date[date_key], _start, _end )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Period comparison\Previous period
+		lineageTag: e2f79d4b-f037-496d-8a00-cf888e134d41
+
+	measure 'Ecommerce purchases (Comparison)' =
+			VAR _start = [Comparison Start]
+			VAR _end   = [Comparison End]
+			RETURN
+			    IF (
+			        _start >= [First Data Date],
+			        CALCULATE (
+			            [Ecommerce purchases],
+			            REMOVEFILTERS ( dim_date ),
+			            DATESBETWEEN ( dim_date[date_key], _start, _end )
+			        )
+			    )
+		formatString: #,0
+		displayFolder: Period comparison\Previous period
+		lineageTag: a9f90c4c-cb7d-45be-a1a9-51dfcc00b2f8
+
+	measure 'ECVR (Comparison)' =
+			VAR _start = [Comparison Start]
+			VAR _end   = [Comparison End]
+			RETURN
+			    IF (
+			        _start >= [First Data Date],
+			        CALCULATE (
+			            [ECVR],
+			            REMOVEFILTERS ( dim_date ),
+			            DATESBETWEEN ( dim_date[date_key], _start, _end )
+			        )
+			    )
+		formatString: 0.00%
+		displayFolder: Period comparison\Previous period
+		lineageTag: 1289815c-90e0-4e50-bb26-dbbcf317cfec
+
+	measure 'Purchase revenue (Comparison)' =
+			VAR _start = [Comparison Start]
+			VAR _end   = [Comparison End]
+			RETURN
+			    IF (
+			        _start >= [First Data Date],
+			        CALCULATE (
+			            [Purchase revenue],
+			            REMOVEFILTERS ( dim_date ),
+			            DATESBETWEEN ( dim_date[date_key], _start, _end )
+			        )
+			    )
+		formatString: \$#,0.00
+		displayFolder: Period comparison\Previous period
+		lineageTag: 9002b35b-116b-4397-9b85-54be4d919d72
+
+	measure 'Total users Change %' = DIVIDE ( [Total users] - [Total users (Comparison)], [Total users (Comparison)] )
+		formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+		displayFolder: Period comparison\Change %
+		lineageTag: 65558fe6-1e04-4c3d-9056-9cea2c4af982
+
+	measure 'New users Change %' = DIVIDE ( [New users] - [New users (Comparison)], [New users (Comparison)] )
+		formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+		displayFolder: Period comparison\Change %
+		lineageTag: 8bd5d505-a833-4b68-890e-75465c848adf
+
+	measure 'Ecommerce purchases Change %' = DIVIDE ( [Ecommerce purchases] - [Ecommerce purchases (Comparison)], [Ecommerce purchases (Comparison)] )
+		formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+		displayFolder: Period comparison\Change %
+		lineageTag: 0753d30b-7d3f-4ec9-823c-c6147be28005
+
+	measure 'ECVR Change %' = DIVIDE ( [ECVR] - [ECVR (Comparison)], [ECVR (Comparison)] )
+		formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+		displayFolder: Period comparison\Change %
+		lineageTag: 7dc2cd94-de68-4b6f-960f-44e08b7d213d
+
+	measure 'Purchase revenue Change %' = DIVIDE ( [Purchase revenue] - [Purchase revenue (Comparison)], [Purchase revenue (Comparison)] )
+		formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+		displayFolder: Period comparison\Change %
+		lineageTag: 9baa0655-2c45-40de-a4db-ddb65e12c919
+
+	measure 'KPI Card SVG Selected' =
+			VAR _KPIOrder =
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] )
+			VAR _KPIName =
+			    SWITCH (
+			        _KPIOrder,
+			        0, "Total users",
+			        1, "New users",
+			        2, "Ecommerce purchases",
+			        3, "ECVR",
+			        4, "Purchase revenue",
+			        "KPI"
+			    )
+			VAR _KPIValue = [KPI Value]
+			VAR _KPIDelta = [KPI Delta]
+			VAR _FormattedValue =
+			    SWITCH (
+			        _KPIOrder,
+			        0, FORMAT ( _KPIValue, "#,##0" ),
+			        1, FORMAT ( _KPIValue, "#,##0" ),
+			        2, FORMAT ( _KPIValue, "#,##0" ),
+			        3, FORMAT ( _KPIValue, "0.00%" ),
+			        4, FORMAT ( _KPIValue, "$#,##0.00" ),
+			        FORMAT ( _KPIValue, "#,##0.##" )
+			    )
+			VAR _FormattedValueEncoded = SUBSTITUTE ( _FormattedValue, "%", "%25" )
+			VAR _FormattedDelta = FORMAT ( _KPIDelta, "+0.0%;-0.0%;0.0%" )
+			VAR _DeltaRaw =
+			    IF ( ISBLANK ( _KPIDelta ), "No comparison available", _FormattedDelta )
+			VAR _DeltaTextEncoded =
+			    SUBSTITUTE (
+			        SUBSTITUTE (
+			            SUBSTITUTE ( _DeltaRaw, "%", "%25" ),
+			            "+", "%2B"
+			        ),
+			        " ", "%20"
+			    )
+			VAR _DeltaColor =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _KPIDelta ), "%2364778F",
+			        _KPIDelta > 0, "%230057CE",
+			        _KPIDelta < 0, "%23D51A9F",
+			        "%2364778F"
+			    )
+			VAR _DeltaFill =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _KPIDelta ), "%23F3F6FA",
+			        _KPIDelta > 0, "%23EAF2FF",
+			        _KPIDelta < 0, "%23FCEAF5",
+			        "%23F3F6FA"
+			    )
+			VAR _DeltaArrow =
+			    SWITCH (
+			        TRUE (),
+			        ISBLANK ( _KPIDelta ), "",
+			        _KPIDelta > 0, "&#9650;",
+			        _KPIDelta < 0, "&#9660;",
+			        "&#8212;"
+			    )
+			VAR _DeltaDisplay =
+			    IF ( _DeltaArrow = "", _DeltaTextEncoded, _DeltaArrow & "%20" & _DeltaTextEncoded )
+			VAR _SVG =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 180 100' display='block'>"
+			        & "<rect x='1' y='1' width='178' height='98' rx='7' fill='%23FFFFFF'/>"
+			        & "<text x='12' y='27' font-family='Segoe UI,Arial,sans-serif' font-size='13' font-weight='600' fill='%230057CE'>"
+			        & _KPIName
+			        & "</text>"
+			        & "<text x='12' y='57' font-family='Segoe UI,Arial,sans-serif' font-size='22' font-weight='600' fill='%23041225'>"
+			        & _FormattedValueEncoded
+			        & "</text>"
+			        & "<rect x='10' y='68' width='160' height='22' rx='5' fill='" & _DeltaFill & "'/>"
+			        & "<text x='90' y='84' text-anchor='middle' font-family='Segoe UI,Arial,sans-serif' font-size='13' font-weight='600' fill='" & _DeltaColor & "'>"
+			        & _DeltaDisplay
+			        & "</text>"
+			        & "<rect x='58' y='95' width='64' height='3' rx='1.5' fill='%230057CE'/>"
+			        & "</svg>"
+			RETURN
+			    IF (
+			        HASONEVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			        "data:image/svg+xml;charset=utf-8," & _SVG,
+			        BLANK ()
+			    )
+		lineageTag: 783d68be-2a47-4298-8011-21b750c1b32e
+		dataCategory: ImageUrl
+
+	measure 'KPI Comparison' =
+			SWITCH (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			    0, [Total users (Comparison)],
+			    1, [New users (Comparison)],
+			    2, [Ecommerce purchases (Comparison)],
+			    3, [ECVR (Comparison)],
+			    4, [Purchase revenue (Comparison)]
+			)
+		displayFolder: Period comparison\Selected KPI table
+		lineageTag: 558e9455-a387-4f5c-bd26-b4bdd05546b8
+
+		formatStringDefinition =
+				SWITCH (
+				    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				    3, "0.00%",
+				    4, "\$#,0",
+				    "#,0"
+				)
+
+	measure 'KPI Share of Total' =
+			IF (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ) = 3,
+			    BLANK (),    -- a rate (ECVR) has no meaningful share of total
+			    DIVIDE (
+			        [KPI Value],
+			        CALCULATE ( [KPI Value], ALLSELECTED ( dim_traffic_source ) )
+			    )
+			)
+		formatString: 0.0%
+		displayFolder: Period comparison\Selected KPI table
+		lineageTag: c44d6e94-ec22-429b-8f99-36de70beb261
+
+	measure 'KPI Target Bar' =
+			-- Same logic as UDF_TargetLineBarChart, inlined as a regular measure.
+			-- Bar = selected KPI for the selected period; dashed line = comparison period.
+			
+			-- Colors (# encoded as %23 so the data URI stays valid)
+			VAR _AboveColor  = "%230057CE"   -- primary:   at/above comparison
+			VAR _BelowColor  = "%23D51A9F"   -- secondary: below comparison
+			VAR _TrackColor  = "%23E6EDF8"   -- light tint of primary
+			VAR _TargetColor = "%23041225"   -- main text color
+			
+			-- Geometry
+			VAR _ChartHeight = 35
+			VAR _BarHeight   = 28
+			VAR _AxisMin     = 0
+			VAR _AxisMax     = 130
+			
+			-- Values
+			VAR _Actual      = [KPI Value]
+			VAR _Target      = [KPI Comparison]
+			VAR _HasTarget   = NOT ISBLANK ( _Target )
+			VAR _Performance = DIVIDE ( _Actual - _Target, _Target )
+			VAR _Range       = _AxisMax - _AxisMin
+			
+			-- Common scale across all traffic sources shown
+			VAR _MaxActual =
+			    CALCULATE (
+			        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Value] ),
+			        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+			    )
+			VAR _MaxTarget =
+			    CALCULATE (
+			        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Comparison] ),
+			        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+			    )
+			VAR _GlobalMax = MAX ( _MaxActual, _MaxTarget ) * 1.15
+			
+			VAR _ActualWidth = MAX ( 0, DIVIDE ( _Actual, _GlobalMax ) * _Range )
+			VAR _TargetPos   = _AxisMin + DIVIDE ( _Target, _GlobalMax ) * _Range
+			VAR _BarColor    = IF ( _HasTarget && _Performance < 0, _BelowColor, _AboveColor )
+			VAR _BarY        = ( _ChartHeight - _BarHeight ) / 2
+			
+			VAR _SVG =
+			    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 "
+			        & _AxisMax & " " & _ChartHeight & "' preserveAspectRatio='none'>"
+			    & "<rect x='" & _AxisMin & "' y='" & _BarY & "' width='" & _Range & "' height='" & _BarHeight
+			        & "' fill='" & _TrackColor & "' rx='4' ry='4'/>"
+			    & "<rect x='" & _AxisMin & "' y='" & _BarY & "' width='" & _ActualWidth & "' height='" & _BarHeight
+			        & "' fill='" & _BarColor & "' rx='4' ry='4'/>"
+			    & IF (
+			        _HasTarget,
+			        "<line x1='" & _TargetPos & "' y1='0' x2='" & _TargetPos & "' y2='" & _ChartHeight
+			            & "' stroke='" & _TargetColor & "' stroke-width='2' stroke-dasharray='4 2'/>",
+			        ""
+			    )
+			    & "</svg>"
+			
+			RETURN
+			    IF (
+			        HASONEVALUE ( dim_traffic_source[traffic_source] ) && NOT ISBLANK ( _Actual ),
+			        _SVG
+			    )
+		displayFolder: Period comparison\Selected KPI table
+		lineageTag: b02f9b23-c0ca-4d7c-a223-f8f1c2ec60d4
+		dataCategory: ImageUrl
+
+	measure 'KPI Table Title' =
+			"Acquisition by traffic source – " & SWITCH (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			    0, "Total users",
+			    1, "New users",
+			    2, "Ecommerce purchases",
+			    3, "ECVR",
+			    4, "Purchase revenue",
+			    "KPIs"
+			)
+		displayFolder: Period comparison\Selected KPI table
+		lineageTag: 10a9bc79-44a7-4ede-918e-3a004b479a07
+
+	measure 'KPI Table Subtitle' = [Period Range Label] & "  " & [Comparison Caption] & "  (" & [Comparison Range Label] & ")"
+		displayFolder: Period comparison\Selected KPI table
+		lineageTag: 75152273-45a2-4c77-9b49-02d50c10c1a6
+
+	/// Value for the selected KPI in the configured comparison period.
+	measure 'KPI Comparison Value' =
+			SWITCH (
+			    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+			    0, [Total users (Comparison)],
+			    1, [New users (Comparison)],
+			    2, [Ecommerce purchases (Comparison)],
+			    3, [ECVR (Comparison)],
+			    4, [Purchase revenue (Comparison)]
+			)
+		displayFolder: User Acquisition\KPI Selector
+		lineageTag: e15cdd6a-f775-4436-8e05-28f60ac9b59d
+
+		formatStringDefinition =
+				SWITCH (
+				    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				    3, "0.00%",
+				    4, "\$#,0",
+				    "#,0"
+				)
+
+	/// SVG bar: selected-period KPI in blue with comparison-period target marker in magenta.
+	measure 'KPI Target Line Bar SVG' =
+			VAR _Actual = [KPI Value]
+			VAR _Target = [KPI Comparison Value]
+			VAR _MaxActual =
+			    CALCULATE (
+			        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Value] ),
+			        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+			    )
+			VAR _MaxTarget =
+			    CALCULATE (
+			        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Comparison Value] ),
+			        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+			    )
+			VAR _ScaleMax = MAX ( _MaxActual, _MaxTarget )
+			VAR _ChartWidth = 180
+			VAR _ChartHeight = 34
+			VAR _BarWidth = MAX ( 0, DIVIDE ( _Actual, _ScaleMax, 0 ) * _ChartWidth )
+			VAR _TargetX = MIN ( _ChartWidth, MAX ( 0, DIVIDE ( _Target, _ScaleMax, 0 ) * _ChartWidth ) )
+			VAR _TargetLine =
+			    IF (
+			        NOT ISBLANK ( _Target ),
+			        "<line x1='" & FORMAT ( _TargetX, "0.0" ) & "' y1='3' x2='" & FORMAT ( _TargetX, "0.0" ) & "' y2='31' stroke='%23D51A9F' stroke-width='3'/>",
+			        ""
+			    )
+			VAR _Svg =
+			    "<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 180 34' preserveAspectRatio='none'>"
+			        & "<rect x='0' y='7' width='180' height='20' rx='3' fill='%23041225' fill-opacity='0.08'/>"
+			        & "<rect x='0' y='7' width='" & FORMAT ( _BarWidth, "0.0" ) & "' height='20' rx='3' fill='%230057CE'/>"
+			        & _TargetLine
+			        & "</svg>"
+			RETURN
+			    IF ( NOT ISBLANK ( _Actual ), "data:image/svg+xml;utf8," & _Svg )
+		formatString: @
+		displayFolder: User Acquisition\KPI Selector
+		lineageTag: 3ef7d35f-d496-44b9-9616-ea6eb5e7c2c9
+		dataCategory: ImageUrl
+
+	/// First day with data in the model (ignores all filters).
+	measure 'First Data Date' = CALCULATE ( MIN ( fact_events[date_key] ), REMOVEFILTERS () )
+		formatString: d mmm yyyy
+		displayFolder: Period comparison\Helpers
+		lineageTag: 75b1208c-ac14-4804-b36b-aeaf40604ec7
+
+	partition #_Measures_ = m
+		mode: import
+		source =
+				let
+				  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"Column1"})
+				in
+				  #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

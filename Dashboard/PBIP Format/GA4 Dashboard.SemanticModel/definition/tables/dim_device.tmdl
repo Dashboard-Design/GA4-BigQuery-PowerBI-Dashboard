@@ -1,0 +1,102 @@
+table dim_device
+	lineageTag: e267f21e-a1db-478c-9885-d6f4c00eb1b7
+
+	column device_key
+		dataType: string
+		lineageTag: 34c9a6b2-6a44-47fe-856c-fdde1d55a146
+		summarizeBy: none
+		sourceColumn: device_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_category
+		dataType: string
+		lineageTag: d6e202dd-3ada-4559-b689-fcdc0f479c5b
+		summarizeBy: none
+		sourceColumn: device_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column mobile_brand_name
+		dataType: string
+		lineageTag: 3785e115-8a3c-4c28-aa14-a8a82a5fb67a
+		summarizeBy: none
+		sourceColumn: mobile_brand_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column mobile_model_name
+		dataType: string
+		lineageTag: 21fd9de6-cfeb-4515-962c-a4eaf9ea7133
+		summarizeBy: none
+		sourceColumn: mobile_model_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column mobile_marketing_name
+		dataType: string
+		lineageTag: 219eabdd-aab7-43c3-8fdc-1521e2431469
+		summarizeBy: none
+		sourceColumn: mobile_marketing_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column operating_system
+		dataType: string
+		lineageTag: cf7aaf74-9128-4a0a-b37b-5a014290a387
+		summarizeBy: none
+		sourceColumn: operating_system
+
+		annotation SummarizationSetBy = Automatic
+
+	column operating_system_version
+		dataType: string
+		lineageTag: fcc367c3-bad4-4d72-8d18-e48990986eb3
+		summarizeBy: none
+		sourceColumn: operating_system_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column language
+		dataType: string
+		lineageTag: fef26677-3bfc-4eb2-9e5e-3b4bd952f482
+		summarizeBy: none
+		sourceColumn: language
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_limited_ad_tracking
+		dataType: string
+		lineageTag: 540b55e5-72e4-447e-abc2-cd79e1fa0103
+		summarizeBy: none
+		sourceColumn: is_limited_ad_tracking
+
+		annotation SummarizationSetBy = Automatic
+
+	column browser
+		dataType: string
+		lineageTag: 9ab71206-f111-4725-9b50-1f50feb6cc2a
+		summarizeBy: none
+		sourceColumn: browser
+
+		annotation SummarizationSetBy = Automatic
+
+	column browser_version
+		dataType: string
+		lineageTag: 6c231255-3c8a-4ad1-9cb2-d3f5eb1d5da4
+		summarizeBy: none
+		sourceColumn: browser_version
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_device = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    dim_device_Table = ga4_marketing_dashboard_Schema{[Name="dim_device",Kind="Table"]}[Data]
+				in
+				    dim_device_Table
+

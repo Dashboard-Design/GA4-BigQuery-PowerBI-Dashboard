@@ -1,0 +1,79 @@
+table dim_user
+	lineageTag: 07c48631-7e09-445a-b52e-14ac2e7c08d7
+
+	column user_key
+		dataType: string
+		lineageTag: 2595a217-81d6-4102-b50e-02cb817e8f07
+		summarizeBy: none
+		sourceColumn: user_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: string
+		lineageTag: 98721a2b-f41a-4cd4-8a5e-e002d1ebe530
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_touch_timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cce53011-6cd9-4845-a123-c86c85f22fe4
+		summarizeBy: none
+		sourceColumn: first_touch_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_seen_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 78ee60c2-04b6-4bb9-9974-2834823943db
+		summarizeBy: none
+		sourceColumn: first_seen_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column last_seen_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2b214c28-a554-4c0f-91cc-f8eeb5277a85
+		summarizeBy: none
+		sourceColumn: last_seen_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column user_ltv_revenue
+		dataType: double
+		lineageTag: 2ed35c66-f013-4e7f-a942-321632bafd0a
+		summarizeBy: sum
+		sourceColumn: user_ltv_revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column user_ltv_currency
+		dataType: string
+		lineageTag: 849a33a5-aa01-4ccf-81ef-7fa637e40c1a
+		summarizeBy: none
+		sourceColumn: user_ltv_currency
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_user = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    dim_user_Table = ga4_marketing_dashboard_Schema{[Name="dim_user",Kind="Table"]}[Data]
+				in
+				    dim_user_Table
+

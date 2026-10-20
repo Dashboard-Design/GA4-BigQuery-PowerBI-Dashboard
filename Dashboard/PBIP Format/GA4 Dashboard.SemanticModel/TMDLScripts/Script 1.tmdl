@@ -1,0 +1,177 @@
+createOrReplace
+
+	ref table '#_Measures_'
+
+		measure 'Total users' = DISTINCTCOUNT ( fact_events[user_key] )
+			formatString: #,0
+			displayFolder: User Acquisition\Base
+
+		measure 'New users' = ```
+				CALCULATE (
+				    DISTINCTCOUNT ( fact_events[user_key] ),
+				    fact_events[event_name] IN { "first_visit", "first_open" }
+				)
+				```
+			formatString: #,0
+			displayFolder: User Acquisition\Base
+
+		measure 'Sessions' = COUNTROWS ( fact_sessions )
+			formatString: #,0
+			displayFolder: User Acquisition\Base
+
+		measure 'Ecommerce purchases' = ```
+				CALCULATE (
+				    COUNTROWS ( fact_events ),
+				    fact_events[event_name] = "purchase"
+				)
+				```
+			formatString: #,0
+			displayFolder: User Acquisition\Base
+
+		measure 'Purchase revenue' = SUM ( fact_events[purchase_revenue_in_usd] )
+			formatString: \$#,0.00
+			displayFolder: User Acquisition\Base
+
+		measure 'ECVR' = DIVIDE ( [Ecommerce purchases], [Sessions] )
+			formatString: 0.00%
+			displayFolder: User Acquisition\Base
+
+		measure 'Total users PY' = ```
+				CALCULATE (
+				    [Total users],
+				    DATEADD ( dim_date[date_key], -1, YEAR )
+				)
+				```
+			formatString: #,0
+			displayFolder: User Acquisition\Previous year
+
+		measure 'New users PY' = ```
+				CALCULATE (
+				    [New users],
+				    DATEADD ( dim_date[date_key], -1, YEAR )
+				)
+				```
+			formatString: #,0
+			displayFolder: User Acquisition\Previous year
+
+		measure 'Sessions PY' = ```
+				CALCULATE (
+				    [Sessions],
+				    DATEADD ( dim_date[date_key], -1, YEAR )
+				)
+				```
+			formatString: #,0
+			displayFolder: User Acquisition\Previous year
+
+		measure 'Ecommerce purchases PY' = ```
+				CALCULATE (
+				    [Ecommerce purchases],
+				    DATEADD ( dim_date[date_key], -1, YEAR )
+				)
+				```
+			formatString: #,0
+			displayFolder: User Acquisition\Previous year
+
+		measure 'Purchase revenue PY' = ```
+				CALCULATE (
+				    [Purchase revenue],
+				    DATEADD ( dim_date[date_key], -1, YEAR )
+				)
+				```
+			formatString: \$#,0.00
+			displayFolder: User Acquisition\Previous year
+
+		measure 'ECVR PY' = DIVIDE ( [Ecommerce purchases PY], [Sessions PY] )
+			formatString: 0.00%
+			displayFolder: User Acquisition\Previous year
+
+		measure '% Revenue PY' = ```
+				DIVIDE (
+				    [Purchase revenue PY],
+				    CALCULATE ( [Purchase revenue PY], ALLSELECTED ( dim_traffic_source ) )
+				)
+				```
+			formatString: 0.00%
+			displayFolder: User Acquisition\Previous year
+
+		measure 'Total users YoY %' = ```
+				DIVIDE (
+				    [Total users] - [Total users PY],
+				    [Total users PY]
+				)
+				```
+			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+			displayFolder: User Acquisition\Change vs previous year
+
+		measure 'New users YoY %' = ```
+				DIVIDE (
+				    [New users] - [New users PY],
+				    [New users PY]
+				)
+				```
+			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+			displayFolder: User Acquisition\Change vs previous year
+
+		measure 'Ecommerce purchases YoY %' = ```
+				DIVIDE (
+				    [Ecommerce purchases] - [Ecommerce purchases PY],
+				    [Ecommerce purchases PY]
+				)
+				```
+			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+			displayFolder: User Acquisition\Change vs previous year
+
+		measure 'ECVR YoY %' = ```
+				DIVIDE (
+				    [ECVR] - [ECVR PY],
+				    [ECVR PY]
+				)
+				```
+			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+			displayFolder: User Acquisition\Change vs previous year
+
+		measure 'Purchase revenue YoY %' = ```
+				DIVIDE (
+				    [Purchase revenue] - [Purchase revenue PY],
+				    [Purchase revenue PY]
+				)
+				```
+			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+			displayFolder: User Acquisition\Change vs previous year
+
+		measure '% Revenue YoY %' = ```
+				DIVIDE (
+				    [% Revenue] - [% Revenue PY],
+				    [% Revenue PY]
+				)
+				```
+			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+			displayFolder: User Acquisition\Change vs previous year
+
+		measure '% of Users' = ```
+				DIVIDE (
+				    [Total users],
+				    CALCULATE ( [Total users], ALLSELECTED ( dim_traffic_source ) )
+				)
+				```
+			formatString: 0.00%
+			displayFolder: User Acquisition\Share of total
+
+		measure '% New Users' = ```
+				DIVIDE (
+				    [New users],
+				    CALCULATE ( [New users], ALLSELECTED ( dim_traffic_source ) )
+				)
+				```
+			formatString: 0.00%
+			displayFolder: User Acquisition\Share of total
+
+		measure '% Revenue' = ```
+				DIVIDE (
+				    [Purchase revenue],
+				    CALCULATE ( [Purchase revenue], ALLSELECTED ( dim_traffic_source ) )
+				)
+				```
+			formatString: 0.00%
+			displayFolder: User Acquisition\Share of total
+

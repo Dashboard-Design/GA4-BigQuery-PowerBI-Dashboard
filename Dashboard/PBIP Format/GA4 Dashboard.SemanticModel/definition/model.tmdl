@@ -1,0 +1,30 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["fact_event_items","fact_sessions","fact_events","dim_user","dim_traffic_source","dim_item","dim_geo","dim_device","dim_date","dim_app_info","#_Measures_"]
+
+annotation PBI_ProTooling = ["TMDLView_Desktop","DevMode","MCP-PBIModeling"]
+
+ref table fact_event_items
+ref table fact_sessions
+ref table fact_events
+ref table dim_user
+ref table dim_traffic_source
+ref table dim_item
+ref table dim_geo
+ref table dim_device
+ref table dim_date
+ref table dim_app_info
+ref table #_Measures_
+ref table 'KPI Selector'
+
+ref cultureInfo en-US
+

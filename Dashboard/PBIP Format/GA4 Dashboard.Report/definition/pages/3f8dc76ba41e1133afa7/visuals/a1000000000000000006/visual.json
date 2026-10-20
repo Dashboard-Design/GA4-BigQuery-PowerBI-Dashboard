@@ -1,0 +1,297 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "a1000000000000000006",
+  "position": {
+    "x": 289.890590809628,
+    "y": 679.21225382932164,
+    "z": 2000,
+    "height": 365.51422319474835,
+    "width": 1583.8949671772427,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dim_traffic_source"
+                    }
+                  },
+                  "Property": "traffic_source"
+                }
+              },
+              "queryRef": "dim_traffic_source.traffic_source",
+              "nativeQueryRef": "traffic_source",
+              "displayName": "Traffic source"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "Total users"
+                }
+              },
+              "queryRef": "#_Measures_.Total users",
+              "nativeQueryRef": "Total users",
+              "displayName": "Total users"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "Total users YoY %"
+                }
+              },
+              "queryRef": "#_Measures_.Total users YoY %",
+              "nativeQueryRef": "Total users YoY %",
+              "displayName": "% Δ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "% of Users"
+                }
+              },
+              "queryRef": "#_Measures_.% of Users",
+              "nativeQueryRef": "% of Users",
+              "displayName": "% of Users"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "New users"
+                }
+              },
+              "queryRef": "#_Measures_.New users",
+              "nativeQueryRef": "New users",
+              "displayName": "New users"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "New users YoY %"
+                }
+              },
+              "queryRef": "#_Measures_.New users YoY %",
+              "nativeQueryRef": "New users YoY %",
+              "displayName": "% Δ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "% New Users"
+                }
+              },
+              "queryRef": "#_Measures_.% New Users",
+              "nativeQueryRef": "% New Users",
+              "displayName": "% New Users"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "Ecommerce purchases"
+                }
+              },
+              "queryRef": "#_Measures_.Ecommerce purchases",
+              "nativeQueryRef": "Ecommerce purchases",
+              "displayName": "Ecommerce purchases"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "Ecommerce purchases YoY %"
+                }
+              },
+              "queryRef": "#_Measures_.Ecommerce purchases YoY %",
+              "nativeQueryRef": "Ecommerce purchases YoY %",
+              "displayName": "% Δ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "ECVR"
+                }
+              },
+              "queryRef": "#_Measures_.ECVR",
+              "nativeQueryRef": "ECVR",
+              "displayName": "ECVR"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "ECVR YoY %"
+                }
+              },
+              "queryRef": "#_Measures_.ECVR YoY %",
+              "nativeQueryRef": "ECVR YoY %",
+              "displayName": "% Δ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "Purchase revenue"
+                }
+              },
+              "queryRef": "#_Measures_.Purchase revenue",
+              "nativeQueryRef": "Purchase revenue",
+              "displayName": "Purchase revenue"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "Purchase revenue YoY %"
+                }
+              },
+              "queryRef": "#_Measures_.Purchase revenue YoY %",
+              "nativeQueryRef": "Purchase revenue YoY %",
+              "displayName": "% Δ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "% Revenue"
+                }
+              },
+              "queryRef": "#_Measures_.% Revenue",
+              "nativeQueryRef": "% Revenue",
+              "displayName": "% Revenue"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "% Revenue YoY %"
+                }
+              },
+              "queryRef": "#_Measures_.% Revenue YoY %",
+              "nativeQueryRef": "% Revenue YoY %",
+              "displayName": "% Δ"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Acquisition by traffic source'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,243 @@
+table fact_event_items
+	lineageTag: f8ffe5e1-6fd0-4bdf-9dc3-fcca5408dc6e
+
+	column event_id
+		dataType: string
+		lineageTag: 2f02e27c-fd46-4222-97f8-c8b56a0145b1
+		summarizeBy: none
+		sourceColumn: event_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_id
+		dataType: string
+		lineageTag: c5e0b8bf-4fcd-4e82-8552-9d4e25bb36df
+		summarizeBy: none
+		sourceColumn: item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_name
+		dataType: string
+		lineageTag: 8304b4ba-2f5a-448b-a876-98def16675ae
+		summarizeBy: none
+		sourceColumn: item_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_brand
+		dataType: string
+		lineageTag: 23c24793-b5b8-493b-8915-b162bd62070d
+		summarizeBy: none
+		sourceColumn: item_brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_variant
+		dataType: string
+		lineageTag: f52f2c0d-5a8c-4039-9d91-3761c42498f2
+		summarizeBy: none
+		sourceColumn: item_variant
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category
+		dataType: string
+		lineageTag: f1e19066-6453-4c00-82d0-25b90b7fe00a
+		summarizeBy: none
+		sourceColumn: item_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category2
+		dataType: string
+		lineageTag: f8d841b9-0469-4de4-9aeb-93edf9c80174
+		summarizeBy: none
+		sourceColumn: item_category2
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category3
+		dataType: string
+		lineageTag: 2a710287-d236-450b-801e-65ab43908dca
+		summarizeBy: none
+		sourceColumn: item_category3
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category4
+		dataType: string
+		lineageTag: 79c32168-7879-4edc-9875-7c7608cbf347
+		summarizeBy: none
+		sourceColumn: item_category4
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category5
+		dataType: string
+		lineageTag: c86edccc-1aab-4e8c-bbc5-b93e02c3c8f7
+		summarizeBy: none
+		sourceColumn: item_category5
+
+		annotation SummarizationSetBy = Automatic
+
+	column price_in_usd
+		dataType: double
+		lineageTag: c6cb6d0f-d172-42b4-8bc5-a6ff9d2b28c8
+		summarizeBy: sum
+		sourceColumn: price_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column price
+		dataType: double
+		lineageTag: a5bb49af-9c75-48ae-aabd-26f12e1514e7
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 54aff18a-93a8-4fd2-aa3c-7990a212bf7a
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_revenue_in_usd
+		dataType: double
+		lineageTag: 17696a0f-f497-4310-bb1a-f1b1ffd18375
+		summarizeBy: sum
+		sourceColumn: item_revenue_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column item_revenue
+		dataType: double
+		lineageTag: 91610e53-d529-4701-8f7d-0ed63de85664
+		summarizeBy: sum
+		sourceColumn: item_revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column item_refund_in_usd
+		dataType: double
+		lineageTag: 55f494c6-1c42-4ac8-ba8e-bfa5c04f1473
+		summarizeBy: sum
+		sourceColumn: item_refund_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column item_refund
+		dataType: double
+		lineageTag: 47c0eb97-0f59-4b7f-837c-142874557015
+		summarizeBy: sum
+		sourceColumn: item_refund
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column coupon
+		dataType: string
+		lineageTag: 5241f4e8-0d34-40de-9ec1-3d4c421e44c4
+		summarizeBy: none
+		sourceColumn: coupon
+
+		annotation SummarizationSetBy = Automatic
+
+	column affiliation
+		dataType: string
+		lineageTag: 3f2ca4c2-c9c8-42bc-a56f-0573434ac47f
+		summarizeBy: none
+		sourceColumn: affiliation
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_id
+		dataType: string
+		lineageTag: f9a787e4-a595-411e-be71-d5d2f7a7c078
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_list_id
+		dataType: string
+		lineageTag: 338232f5-2e38-4d44-b08b-24a6a1ff10a7
+		summarizeBy: none
+		sourceColumn: item_list_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_list_name
+		dataType: string
+		lineageTag: d7408ee0-e9cc-483c-8a81-f49cdeb41a5a
+		summarizeBy: none
+		sourceColumn: item_list_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_list_index
+		dataType: string
+		lineageTag: acb68976-0b78-446d-b1e2-6a6c07b2e555
+		summarizeBy: none
+		sourceColumn: item_list_index
+
+		annotation SummarizationSetBy = Automatic
+
+	column promotion_id
+		dataType: string
+		lineageTag: 8636634a-74e1-4038-87ce-a16c62bca6e1
+		summarizeBy: none
+		sourceColumn: promotion_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column promotion_name
+		dataType: string
+		lineageTag: 8a8dd4a0-9019-4c9d-8dce-256eb87ee79a
+		summarizeBy: none
+		sourceColumn: promotion_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column creative_name
+		dataType: string
+		lineageTag: f0c46980-4edf-4d1c-a5d0-b8bd5202097d
+		summarizeBy: none
+		sourceColumn: creative_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column creative_slot
+		dataType: string
+		lineageTag: b0fb1982-d1ca-4177-a8f6-6e77adf431cc
+		summarizeBy: none
+		sourceColumn: creative_slot
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_event_items = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    fact_event_items_View = ga4_marketing_dashboard_Schema{[Name="fact_event_items",Kind="View"]}[Data]
+				in
+				    fact_event_items_View
+

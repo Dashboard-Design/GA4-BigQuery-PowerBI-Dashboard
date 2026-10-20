@@ -1,0 +1,24 @@
+relationship AutoDetected_5df1b329-4cf1-46e0-a912-9fe09fbc06da
+	fromColumn: fact_sessions.user_key
+	toColumn: dim_user.user_key
+
+relationship AutoDetected_48b3d952-aab3-45e0-85d9-3bba8983a9ad
+	fromColumn: fact_events.user_key
+	toColumn: dim_user.user_key
+
+relationship AutoDetected_927aec37-6a9e-44c9-a523-18e68221237d
+	fromColumn: fact_sessions.traffic_source_key
+	toColumn: dim_traffic_source.traffic_source_key
+
+relationship AutoDetected_a14cb502-0fb3-40db-a536-ee29a64c1692
+	fromColumn: fact_events.traffic_source_key
+	toColumn: dim_traffic_source.traffic_source_key
+
+relationship fact_events_date_key_dim_date_date_key
+	fromColumn: fact_events.date_key
+	toColumn: dim_date.date_key
+
+relationship fact_sessions_date_key_dim_date_date_key
+	fromColumn: fact_sessions.date_key
+	toColumn: dim_date.date_key
+

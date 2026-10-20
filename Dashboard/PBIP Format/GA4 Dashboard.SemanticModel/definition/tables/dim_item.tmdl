@@ -1,0 +1,86 @@
+table dim_item
+	lineageTag: 26b11db9-a724-4fae-8713-d3090afe80d8
+
+	column item_key
+		dataType: string
+		lineageTag: dc2a5778-aa4e-4f6b-ac92-21cb5c5db102
+		summarizeBy: none
+		sourceColumn: item_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_name
+		dataType: string
+		lineageTag: f990a4ae-a283-465c-81a9-c70249cdccf2
+		summarizeBy: none
+		sourceColumn: item_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_brand
+		dataType: string
+		lineageTag: 8a62cbbf-cb26-41f3-99ee-126ce9e6ad81
+		summarizeBy: none
+		sourceColumn: item_brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_variant
+		dataType: string
+		lineageTag: 12b2202e-3751-49f5-95e0-1b95db3691e5
+		summarizeBy: none
+		sourceColumn: item_variant
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category
+		dataType: string
+		lineageTag: 26b1f2e8-c9b5-40b3-9f16-01215b87817f
+		summarizeBy: none
+		sourceColumn: item_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category2
+		dataType: string
+		lineageTag: 3fddb3d5-902d-4c11-a060-a98497a56f7c
+		summarizeBy: none
+		sourceColumn: item_category2
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category3
+		dataType: string
+		lineageTag: b116dac3-7899-455c-8fe0-52c6bbb0c3f4
+		summarizeBy: none
+		sourceColumn: item_category3
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category4
+		dataType: string
+		lineageTag: 2fa67f6a-161a-4a1b-b833-0eebfc431847
+		summarizeBy: none
+		sourceColumn: item_category4
+
+		annotation SummarizationSetBy = Automatic
+
+	column item_category5
+		dataType: string
+		lineageTag: a953d804-052e-4940-90ec-62c0fd4ad96d
+		summarizeBy: none
+		sourceColumn: item_category5
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_item = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    dim_item_Table = ga4_marketing_dashboard_Schema{[Name="dim_item",Kind="Table"]}[Data]
+				in
+				    dim_item_Table
+

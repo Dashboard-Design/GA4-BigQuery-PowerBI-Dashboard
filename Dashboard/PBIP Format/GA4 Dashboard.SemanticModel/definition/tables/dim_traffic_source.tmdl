@@ -1,0 +1,46 @@
+table dim_traffic_source
+	lineageTag: 4394b324-b458-4245-8bcb-a8caf3aa6720
+
+	column traffic_source_key
+		dataType: string
+		lineageTag: a4c8025e-9ef4-41a1-84fe-9dca26352ba1
+		summarizeBy: none
+		sourceColumn: traffic_source_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_medium
+		dataType: string
+		lineageTag: dfe956a0-262c-4019-8c05-7d41aaaf9787
+		summarizeBy: none
+		sourceColumn: traffic_medium
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_campaign
+		dataType: string
+		lineageTag: cb15c0aa-5576-4472-898a-380819211bf7
+		summarizeBy: none
+		sourceColumn: traffic_campaign
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_source
+		dataType: string
+		lineageTag: b98d920c-75a1-4b9e-b03f-068755617011
+		summarizeBy: none
+		sourceColumn: traffic_source
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_traffic_source = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    dim_traffic_source_Table = ga4_marketing_dashboard_Schema{[Name="dim_traffic_source",Kind="Table"]}[Data]
+				in
+				    dim_traffic_source_Table
+

@@ -1,0 +1,66 @@
+table dim_app_info
+	lineageTag: 4bffc70d-d4ea-45c5-98a2-b3d2eb8cbbe2
+
+	column app_info_key
+		dataType: string
+		lineageTag: 13b873e1-359c-4831-8277-59a8a4fc89c8
+		summarizeBy: none
+		sourceColumn: app_info_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column app_id
+		dataType: string
+		lineageTag: 32f66715-a878-4032-9292-a031b82eca5c
+		summarizeBy: none
+		sourceColumn: app_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column app_version
+		dataType: string
+		lineageTag: bce3a856-5707-4c9d-982d-54770d5ce84f
+		summarizeBy: none
+		sourceColumn: app_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column install_store
+		dataType: string
+		lineageTag: b67f3d33-ceb5-4931-a308-474afc65635e
+		summarizeBy: none
+		sourceColumn: install_store
+
+		annotation SummarizationSetBy = Automatic
+
+	column firebase_app_id
+		dataType: string
+		lineageTag: 0ff5f5e8-179e-4370-90a3-9d84e8df8756
+		summarizeBy: none
+		sourceColumn: firebase_app_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column install_source
+		dataType: string
+		lineageTag: 2116d884-543d-4618-a058-55c222bd8e27
+		summarizeBy: none
+		sourceColumn: install_source
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_app_info = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    dim_app_info_Table = ga4_marketing_dashboard_Schema{[Name="dim_app_info",Kind="Table"]}[Data]
+				in
+				    dim_app_info_Table
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

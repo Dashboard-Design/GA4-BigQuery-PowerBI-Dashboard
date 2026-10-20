@@ -1,0 +1,70 @@
+table dim_geo
+	lineageTag: 8329259b-8ef6-4827-867a-1f7e87d95bb1
+
+	column geo_key
+		dataType: string
+		lineageTag: c6a7ae90-f3bf-4369-bdf4-64c518be2d5b
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column continent
+		dataType: string
+		lineageTag: fa3f95ea-c779-498c-8ea9-14f846828d35
+		summarizeBy: none
+		sourceColumn: continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column sub_continent
+		dataType: string
+		lineageTag: f170db2e-8311-4785-b556-bec1ee89c285
+		summarizeBy: none
+		sourceColumn: sub_continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 0f1cf50a-fa45-4433-86c4-e5ada315f1e2
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		lineageTag: 9b2341a1-8d32-44bd-af91-eaf6833bee8a
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: 0f2453a9-8d3e-4bd0-bf8c-8766c1040978
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column metro
+		dataType: string
+		lineageTag: b7d157c0-0137-42a7-b04d-4a8b8e07a3b2
+		summarizeBy: none
+		sourceColumn: metro
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_geo = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    dim_geo_Table = ga4_marketing_dashboard_Schema{[Name="dim_geo",Kind="Table"]}[Data]
+				in
+				    dim_geo_Table
+

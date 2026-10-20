@@ -1,0 +1,46 @@
+table 'KPI Selector'
+	lineageTag: 19306c11-d48e-4c3b-808b-655cb48549cb
+
+	column 'KPI Selector Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f36b125e-f139-4d7e-bbf3-8b2709a3faa1
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+	column 'KPI Selector Fields'
+		dataType: string
+		isHidden
+		lineageTag: 0e231ad2-1739-4342-a96a-65dd4ea917cf
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'KPI Selector Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+	column 'KPI Selector'
+		dataType: string
+		lineageTag: 83e078bf-68a2-4308-b28b-1b429b10b3f5
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'KPI Selector Order'
+
+		relatedColumnDetails
+			groupByColumn: 'KPI Selector Fields'
+
+	partition 'KPI Selector' = calculated
+		mode: import
+		source =
+				{
+				    ("Total users", NAMEOF('#_Measures_'[Total users]), 0),
+				    ("New users", NAMEOF('#_Measures_'[New users]), 1),
+				    ("Ecommerce purchases", NAMEOF('#_Measures_'[Ecommerce purchases]), 2),
+				    ("ECVR", NAMEOF('#_Measures_'[ECVR]), 3),
+				    ("Purchase revenue", NAMEOF('#_Measures_'[Purchase revenue]), 4)
+				}
+

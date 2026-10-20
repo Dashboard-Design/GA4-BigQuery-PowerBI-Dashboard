@@ -1,0 +1,579 @@
+table fact_events
+	lineageTag: 8833ad14-6bfd-4a4b-8c85-540edd08219d
+
+	column event_id
+		dataType: string
+		lineageTag: bfca315e-a260-49c9-bc83-32c39745caec
+		summarizeBy: none
+		sourceColumn: event_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ce2d7521-1fc2-4ed3-b093-a420fa2153b5
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column event_timestamp
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d1c7e10-6765-421e-a1b9-d65af7fad7d0
+		summarizeBy: sum
+		sourceColumn: event_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_name
+		dataType: string
+		lineageTag: de125b45-c80c-4f45-be9f-bf12997bba03
+		summarizeBy: none
+		sourceColumn: event_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_previous_timestamp
+		dataType: int64
+		formatString: 0
+		lineageTag: 83b403f2-1fef-4280-aaa5-ca992b2b712b
+		summarizeBy: sum
+		sourceColumn: event_previous_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_value_in_usd
+		dataType: double
+		lineageTag: a32d3b71-8122-4d71-9d38-8658fecc7b11
+		summarizeBy: sum
+		sourceColumn: event_value_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column event_bundle_sequence_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 0252ab44-108b-4318-8f91-c8d64fb48804
+		summarizeBy: sum
+		sourceColumn: event_bundle_sequence_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column event_server_timestamp_offset
+		dataType: int64
+		formatString: 0
+		lineageTag: 5848b306-eee1-4468-b635-916c9a191be0
+		summarizeBy: sum
+		sourceColumn: event_server_timestamp_offset
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_id
+		dataType: string
+		lineageTag: 2bc0f39a-444c-4fb5-83bc-4ca321e2ea2a
+		summarizeBy: none
+		sourceColumn: user_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_key
+		dataType: string
+		lineageTag: 538405a3-6143-4a66-bc4c-6b8b1df4c7f8
+		summarizeBy: none
+		sourceColumn: user_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_first_touch_timestamp
+		dataType: int64
+		formatString: 0
+		lineageTag: e13f416e-0d43-4ae0-a666-bd799927d17b
+		summarizeBy: sum
+		sourceColumn: user_first_touch_timestamp
+
+		annotation SummarizationSetBy = Automatic
+
+	column user_ltv_revenue
+		dataType: double
+		lineageTag: addc19fc-a07d-4a86-85cc-f8c8bac55b7a
+		summarizeBy: sum
+		sourceColumn: user_ltv_revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column user_ltv_currency
+		dataType: string
+		lineageTag: 34786654-4137-49fc-8b6a-a73e171127d2
+		summarizeBy: none
+		sourceColumn: user_ltv_currency
+
+		annotation SummarizationSetBy = Automatic
+
+	column analytics_storage
+		dataType: int64
+		formatString: 0
+		lineageTag: 37aa0fe2-8afb-4fce-9a05-7c599c7139f0
+		summarizeBy: sum
+		sourceColumn: analytics_storage
+
+		annotation SummarizationSetBy = Automatic
+
+	column ads_storage
+		dataType: int64
+		formatString: 0
+		lineageTag: c444f24f-3227-4433-98ec-f88f57e18686
+		summarizeBy: sum
+		sourceColumn: ads_storage
+
+		annotation SummarizationSetBy = Automatic
+
+	column uses_transient_token
+		dataType: string
+		lineageTag: da320bac-5da9-4812-b1ea-68b5e89abad6
+		summarizeBy: none
+		sourceColumn: uses_transient_token
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_key
+		dataType: string
+		lineageTag: 50b9aa11-295a-45a7-b457-f3cf41de08af
+		summarizeBy: none
+		sourceColumn: device_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column geo_key
+		dataType: string
+		lineageTag: 60d70d7f-5919-4db0-b35e-65824bb24f31
+		summarizeBy: none
+		sourceColumn: geo_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_source_key
+		dataType: string
+		lineageTag: a2b994b1-441d-4f83-902d-09c0f7dbc096
+		summarizeBy: none
+		sourceColumn: traffic_source_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column app_info_key
+		dataType: string
+		lineageTag: 9f52a81d-a12e-44a5-9ec2-70344feb4ee6
+		summarizeBy: none
+		sourceColumn: app_info_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column device_category
+		dataType: string
+		lineageTag: d3b99c66-a0b4-4c75-90a4-27dd641f8166
+		summarizeBy: none
+		sourceColumn: device_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column mobile_brand_name
+		dataType: string
+		lineageTag: 093020fd-3987-4049-9b27-7e8e6a7707ab
+		summarizeBy: none
+		sourceColumn: mobile_brand_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column mobile_model_name
+		dataType: string
+		lineageTag: 63e16204-0736-46a4-93bb-9cc11cf1435f
+		summarizeBy: none
+		sourceColumn: mobile_model_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column mobile_marketing_name
+		dataType: string
+		lineageTag: 1c98b88d-8dd4-4050-877e-fde42f4737d3
+		summarizeBy: none
+		sourceColumn: mobile_marketing_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column operating_system
+		dataType: string
+		lineageTag: 5c912e58-7716-475e-a85b-3dc93694dc1f
+		summarizeBy: none
+		sourceColumn: operating_system
+
+		annotation SummarizationSetBy = Automatic
+
+	column operating_system_version
+		dataType: string
+		lineageTag: f603ccc5-9e79-47de-8b9f-98d68973540b
+		summarizeBy: none
+		sourceColumn: operating_system_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column language
+		dataType: string
+		lineageTag: ff55949f-856c-465c-8db6-3a665c5c49f7
+		summarizeBy: none
+		sourceColumn: language
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_limited_ad_tracking
+		dataType: string
+		lineageTag: 7b87f24f-e388-4936-8555-88eee813788a
+		summarizeBy: none
+		sourceColumn: is_limited_ad_tracking
+
+		annotation SummarizationSetBy = Automatic
+
+	column browser
+		dataType: string
+		lineageTag: 68c9dc80-c759-444a-9ea7-275e2693f4d0
+		summarizeBy: none
+		sourceColumn: browser
+
+		annotation SummarizationSetBy = Automatic
+
+	column browser_version
+		dataType: string
+		lineageTag: 2ec4d89c-ecc4-486d-bd09-42e9043248b4
+		summarizeBy: none
+		sourceColumn: browser_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column continent
+		dataType: string
+		lineageTag: 5570f91a-20ec-40b4-87ef-769515e52279
+		summarizeBy: none
+		sourceColumn: continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column sub_continent
+		dataType: string
+		lineageTag: ee5d2d1c-a882-4520-ab7e-838ccdbf2a34
+		summarizeBy: none
+		sourceColumn: sub_continent
+
+		annotation SummarizationSetBy = Automatic
+
+	column country
+		dataType: string
+		lineageTag: 432fef42-fb10-4827-bd7d-93c4aef0f546
+		summarizeBy: none
+		sourceColumn: country
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		lineageTag: 7ff8055b-3214-4ce3-a9a4-53570fae8355
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	column city
+		dataType: string
+		lineageTag: 4b6e53d4-e489-4175-b1f5-b83e054b3e70
+		summarizeBy: none
+		sourceColumn: city
+
+		annotation SummarizationSetBy = Automatic
+
+	column metro
+		dataType: string
+		lineageTag: fb783145-c1dd-441b-ad2b-bb3cc09f32b9
+		summarizeBy: none
+		sourceColumn: metro
+
+		annotation SummarizationSetBy = Automatic
+
+	column app_id
+		dataType: string
+		lineageTag: f2b07b07-4744-4ec6-901c-b636322fe32b
+		summarizeBy: none
+		sourceColumn: app_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column app_version
+		dataType: string
+		lineageTag: e9c268f9-210f-4276-81fa-15973a30fa6f
+		summarizeBy: none
+		sourceColumn: app_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column install_store
+		dataType: string
+		lineageTag: 73ad0812-56ea-4403-abf7-89d5df9ff5a7
+		summarizeBy: none
+		sourceColumn: install_store
+
+		annotation SummarizationSetBy = Automatic
+
+	column firebase_app_id
+		dataType: string
+		lineageTag: 5573455c-45e9-4f02-a3ef-e801e325e2c1
+		summarizeBy: none
+		sourceColumn: firebase_app_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column install_source
+		dataType: string
+		lineageTag: 06f502f6-c88e-4a89-b7e3-73b05752be45
+		summarizeBy: none
+		sourceColumn: install_source
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_medium
+		dataType: string
+		lineageTag: c983172b-4b71-4dab-b703-4e96f7bb8db5
+		summarizeBy: none
+		sourceColumn: traffic_medium
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_campaign
+		dataType: string
+		lineageTag: 83320aae-5685-4f7a-b663-76b057d58a04
+		summarizeBy: none
+		sourceColumn: traffic_campaign
+
+		annotation SummarizationSetBy = Automatic
+
+	column traffic_source
+		dataType: string
+		lineageTag: 845ce14a-9ae9-4b69-b043-11828a8dac0a
+		summarizeBy: none
+		sourceColumn: traffic_source
+
+		annotation SummarizationSetBy = Automatic
+
+	column stream_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 24a029c5-fd58-4b56-a267-aca8a3721a26
+		summarizeBy: sum
+		sourceColumn: stream_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column platform
+		dataType: string
+		lineageTag: f5629752-a701-4c36-95e9-8b334116e311
+		summarizeBy: none
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = Automatic
+
+	column hostname
+		dataType: string
+		lineageTag: 885a84dd-0bd4-4bcc-9c53-b775a2fa9885
+		summarizeBy: none
+		sourceColumn: hostname
+
+		annotation SummarizationSetBy = Automatic
+
+	column total_item_quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 1808f654-71aa-4b6a-aa62-0f078c3195d6
+		summarizeBy: sum
+		sourceColumn: total_item_quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column purchase_revenue_in_usd
+		dataType: double
+		lineageTag: 0319ef1b-eb20-4c22-a673-1e9852a5ba6d
+		summarizeBy: sum
+		sourceColumn: purchase_revenue_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column purchase_revenue
+		dataType: double
+		lineageTag: cac5d4a2-8033-4956-986b-dc4761d796ca
+		summarizeBy: sum
+		sourceColumn: purchase_revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column refund_value_in_usd
+		dataType: double
+		lineageTag: 1bfa8f9c-ad9a-497f-aeca-93939751cfdc
+		summarizeBy: sum
+		sourceColumn: refund_value_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column refund_value
+		dataType: double
+		lineageTag: 928e28ab-6470-4712-b147-76025abc16db
+		summarizeBy: sum
+		sourceColumn: refund_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column shipping_value_in_usd
+		dataType: double
+		lineageTag: 3e801cb4-f765-4554-b78e-262f94a691fb
+		summarizeBy: sum
+		sourceColumn: shipping_value_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column shipping_value
+		dataType: double
+		lineageTag: c5125212-192a-4c36-a2ae-c6f7c1363e1b
+		summarizeBy: sum
+		sourceColumn: shipping_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column tax_value_in_usd
+		dataType: double
+		lineageTag: 82974735-100a-4120-b109-a803dd19cc54
+		summarizeBy: sum
+		sourceColumn: tax_value_in_usd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column tax_value
+		dataType: double
+		lineageTag: 40f0f401-563d-441c-abbf-56278a5f953f
+		summarizeBy: sum
+		sourceColumn: tax_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column unique_items
+		dataType: int64
+		formatString: 0
+		lineageTag: bb1335ce-bdf3-4b6a-a56a-1eb54f0eccf7
+		summarizeBy: sum
+		sourceColumn: unique_items
+
+		annotation SummarizationSetBy = Automatic
+
+	column transaction_id
+		dataType: string
+		lineageTag: 006857e3-001c-41fc-9034-8502f54a41ed
+		summarizeBy: none
+		sourceColumn: transaction_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_location
+		dataType: string
+		lineageTag: 3375b9c1-82b6-4ef0-a73b-0886887009cb
+		summarizeBy: none
+		sourceColumn: page_location
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_title
+		dataType: string
+		lineageTag: 337689d8-5c07-4db1-8dfc-8e0609c6040b
+		summarizeBy: none
+		sourceColumn: page_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column page_referrer
+		dataType: string
+		lineageTag: c2216d24-c456-4f5a-8d60-1a3a9f2976ae
+		summarizeBy: none
+		sourceColumn: page_referrer
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 929b36ee-76c4-4e58-a4a6-9c024916e6a6
+		summarizeBy: sum
+		sourceColumn: session_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_number
+		dataType: int64
+		formatString: 0
+		lineageTag: 3ff6d3c3-9098-44d1-90e4-827f3638589b
+		summarizeBy: sum
+		sourceColumn: session_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column engagement_time_msec
+		dataType: int64
+		formatString: 0
+		lineageTag: 2b2e3a8c-f255-4e7d-a6d3-416ef843313b
+		summarizeBy: sum
+		sourceColumn: engagement_time_msec
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_entrance
+		dataType: int64
+		formatString: 0
+		lineageTag: a5904dae-eb17-478e-b71d-a9765c40ccaf
+		summarizeBy: sum
+		sourceColumn: is_entrance
+
+		annotation SummarizationSetBy = Automatic
+
+	column session_engaged
+		dataType: string
+		lineageTag: 4449b4a7-053a-44b2-b10e-b0a2c2af93c1
+		summarizeBy: none
+		sourceColumn: session_engaged
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_events = m
+		mode: import
+		source =
+				let
+				    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+				    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+				    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+				    fact_events_Table = ga4_marketing_dashboard_Schema{[Name="fact_events",Kind="Table"]}[Data]
+				in
+				    fact_events_Table
+

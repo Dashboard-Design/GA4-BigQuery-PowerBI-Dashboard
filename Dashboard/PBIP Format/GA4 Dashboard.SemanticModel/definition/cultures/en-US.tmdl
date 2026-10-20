@@ -1,0 +1,353 @@
+cultureInfo en-US
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "table_measures_.total_users": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "Total users"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Total users": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.new_users": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "New users"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "New users": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.ecommerce_purchases": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "Ecommerce purchases"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Ecommerce purchases": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.ecvr": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "ECVR"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ECVR": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.purchase_revenue": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "Purchase revenue"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Purchase revenue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.total_users_yoy_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "Total users YoY %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Δ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.of_users": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "% of Users"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% of Users": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.new_users_yoy_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "New users YoY %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Δ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.new_users1": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "% New Users"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% New Users": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.ecommerce_purchases_yoy_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "Ecommerce purchases YoY %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Δ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.ecvr_yoy_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "ECVR YoY %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Δ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.purchase_revenue_yoy_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "Purchase revenue YoY %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Δ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.revenue": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "% Revenue"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Revenue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.revenue_yoy_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "% Revenue YoY %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "% Δ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "dim_traffic_source.traffic_source": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "dim_traffic_source",
+			          "ConceptualProperty": "traffic_source"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Traffic source": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_measures_.kpi_value": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "KPI Value"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_measures_.kpi_delta": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "KPI Delta"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_measures_.kpi_target_line_bar_svg": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "#_Measures_",
+			          "ConceptualProperty": "KPI Target Line Bar SVG"
+			        }
+			      },
+			      "State": "Generated"
+			    }
+			  }
+			}
+		contentType: json
+

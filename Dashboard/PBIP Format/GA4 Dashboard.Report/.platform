@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "GA4 Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "f4f97a07-cdf0-4b0e-b63d-bda5f35bf1fe"
+  }
+}

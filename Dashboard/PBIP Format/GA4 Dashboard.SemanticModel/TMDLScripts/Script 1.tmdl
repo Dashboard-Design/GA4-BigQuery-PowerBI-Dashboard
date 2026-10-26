@@ -1,177 +1,2352 @@
 createOrReplace
 
-	ref table '#_Measures_'
+	model Model
+		culture: en-US
+		defaultPowerBIDataSourceVersion: powerBI_V3
+		sourceQueryCulture: en-US
+		valueFilterBehavior: independent
+		dataAccessOptions
+			legacyRedirects
+			returnErrorValuesAsNull
 
-		measure 'Total users' = DISTINCTCOUNT ( fact_events[user_key] )
-			formatString: #,0
-			displayFolder: User Acquisition\Base
+		table fact_event_items
+			lineageTag: f8ffe5e1-6fd0-4bdf-9dc3-fcca5408dc6e
 
-		measure 'New users' = ```
-				CALCULATE (
-				    DISTINCTCOUNT ( fact_events[user_key] ),
-				    fact_events[event_name] IN { "first_visit", "first_open" }
-				)
-				```
-			formatString: #,0
-			displayFolder: User Acquisition\Base
+			column event_id
+				dataType: string
+				lineageTag: 2f02e27c-fd46-4222-97f8-c8b56a0145b1
+				summarizeBy: none
+				sourceColumn: event_id
 
-		measure 'Sessions' = COUNTROWS ( fact_sessions )
-			formatString: #,0
-			displayFolder: User Acquisition\Base
+				annotation SummarizationSetBy = Automatic
 
-		measure 'Ecommerce purchases' = ```
-				CALCULATE (
-				    COUNTROWS ( fact_events ),
-				    fact_events[event_name] = "purchase"
-				)
-				```
-			formatString: #,0
-			displayFolder: User Acquisition\Base
+			column item_id
+				dataType: string
+				lineageTag: c5e0b8bf-4fcd-4e82-8552-9d4e25bb36df
+				summarizeBy: none
+				sourceColumn: item_id
 
-		measure 'Purchase revenue' = SUM ( fact_events[purchase_revenue_in_usd] )
-			formatString: \$#,0.00
-			displayFolder: User Acquisition\Base
+				annotation SummarizationSetBy = Automatic
 
-		measure 'ECVR' = DIVIDE ( [Ecommerce purchases], [Sessions] )
-			formatString: 0.00%
-			displayFolder: User Acquisition\Base
+			column item_name
+				dataType: string
+				lineageTag: 8304b4ba-2f5a-448b-a876-98def16675ae
+				summarizeBy: none
+				sourceColumn: item_name
 
-		measure 'Total users PY' = ```
-				CALCULATE (
-				    [Total users],
-				    DATEADD ( dim_date[date_key], -1, YEAR )
-				)
-				```
-			formatString: #,0
-			displayFolder: User Acquisition\Previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure 'New users PY' = ```
-				CALCULATE (
-				    [New users],
-				    DATEADD ( dim_date[date_key], -1, YEAR )
-				)
-				```
-			formatString: #,0
-			displayFolder: User Acquisition\Previous year
+			column item_brand
+				dataType: string
+				lineageTag: 23c24793-b5b8-493b-8915-b162bd62070d
+				summarizeBy: none
+				sourceColumn: item_brand
 
-		measure 'Sessions PY' = ```
-				CALCULATE (
-				    [Sessions],
-				    DATEADD ( dim_date[date_key], -1, YEAR )
-				)
-				```
-			formatString: #,0
-			displayFolder: User Acquisition\Previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure 'Ecommerce purchases PY' = ```
-				CALCULATE (
-				    [Ecommerce purchases],
-				    DATEADD ( dim_date[date_key], -1, YEAR )
-				)
-				```
-			formatString: #,0
-			displayFolder: User Acquisition\Previous year
+			column item_variant
+				dataType: string
+				lineageTag: f52f2c0d-5a8c-4039-9d91-3761c42498f2
+				summarizeBy: none
+				sourceColumn: item_variant
 
-		measure 'Purchase revenue PY' = ```
-				CALCULATE (
-				    [Purchase revenue],
-				    DATEADD ( dim_date[date_key], -1, YEAR )
-				)
-				```
-			formatString: \$#,0.00
-			displayFolder: User Acquisition\Previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure 'ECVR PY' = DIVIDE ( [Ecommerce purchases PY], [Sessions PY] )
-			formatString: 0.00%
-			displayFolder: User Acquisition\Previous year
+			column item_category
+				dataType: string
+				lineageTag: f1e19066-6453-4c00-82d0-25b90b7fe00a
+				summarizeBy: none
+				sourceColumn: item_category
 
-		measure '% Revenue PY' = ```
-				DIVIDE (
-				    [Purchase revenue PY],
-				    CALCULATE ( [Purchase revenue PY], ALLSELECTED ( dim_traffic_source ) )
-				)
-				```
-			formatString: 0.00%
-			displayFolder: User Acquisition\Previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure 'Total users YoY %' = ```
-				DIVIDE (
-				    [Total users] - [Total users PY],
-				    [Total users PY]
-				)
-				```
-			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
-			displayFolder: User Acquisition\Change vs previous year
+			column item_category2
+				dataType: string
+				lineageTag: f8d841b9-0469-4de4-9aeb-93edf9c80174
+				summarizeBy: none
+				sourceColumn: item_category2
 
-		measure 'New users YoY %' = ```
-				DIVIDE (
-				    [New users] - [New users PY],
-				    [New users PY]
-				)
-				```
-			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
-			displayFolder: User Acquisition\Change vs previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure 'Ecommerce purchases YoY %' = ```
-				DIVIDE (
-				    [Ecommerce purchases] - [Ecommerce purchases PY],
-				    [Ecommerce purchases PY]
-				)
-				```
-			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
-			displayFolder: User Acquisition\Change vs previous year
+			column item_category3
+				dataType: string
+				lineageTag: 2a710287-d236-450b-801e-65ab43908dca
+				summarizeBy: none
+				sourceColumn: item_category3
 
-		measure 'ECVR YoY %' = ```
-				DIVIDE (
-				    [ECVR] - [ECVR PY],
-				    [ECVR PY]
-				)
-				```
-			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
-			displayFolder: User Acquisition\Change vs previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure 'Purchase revenue YoY %' = ```
-				DIVIDE (
-				    [Purchase revenue] - [Purchase revenue PY],
-				    [Purchase revenue PY]
-				)
-				```
-			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
-			displayFolder: User Acquisition\Change vs previous year
+			column item_category4
+				dataType: string
+				lineageTag: 79c32168-7879-4edc-9875-7c7608cbf347
+				summarizeBy: none
+				sourceColumn: item_category4
 
-		measure '% Revenue YoY %' = ```
-				DIVIDE (
-				    [% Revenue] - [% Revenue PY],
-				    [% Revenue PY]
-				)
-				```
-			formatString: \▲ 0.0%;\▼ 0.0%;0.0%
-			displayFolder: User Acquisition\Change vs previous year
+				annotation SummarizationSetBy = Automatic
 
-		measure '% of Users' = ```
-				DIVIDE (
-				    [Total users],
-				    CALCULATE ( [Total users], ALLSELECTED ( dim_traffic_source ) )
-				)
-				```
-			formatString: 0.00%
-			displayFolder: User Acquisition\Share of total
+			column item_category5
+				dataType: string
+				lineageTag: c86edccc-1aab-4e8c-bbc5-b93e02c3c8f7
+				summarizeBy: none
+				sourceColumn: item_category5
 
-		measure '% New Users' = ```
-				DIVIDE (
-				    [New users],
-				    CALCULATE ( [New users], ALLSELECTED ( dim_traffic_source ) )
-				)
-				```
-			formatString: 0.00%
-			displayFolder: User Acquisition\Share of total
+				annotation SummarizationSetBy = Automatic
 
-		measure '% Revenue' = ```
-				DIVIDE (
-				    [Purchase revenue],
-				    CALCULATE ( [Purchase revenue], ALLSELECTED ( dim_traffic_source ) )
-				)
-				```
-			formatString: 0.00%
-			displayFolder: User Acquisition\Share of total
+			column price_in_usd
+				dataType: double
+				lineageTag: c6cb6d0f-d172-42b4-8bc5-a6ff9d2b28c8
+				summarizeBy: sum
+				sourceColumn: price_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column price
+				dataType: double
+				lineageTag: a5bb49af-9c75-48ae-aabd-26f12e1514e7
+				summarizeBy: sum
+				sourceColumn: price
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column quantity
+				dataType: int64
+				formatString: 0
+				lineageTag: 54aff18a-93a8-4fd2-aa3c-7990a212bf7a
+				summarizeBy: sum
+				sourceColumn: quantity
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_revenue_in_usd
+				dataType: double
+				lineageTag: 17696a0f-f497-4310-bb1a-f1b1ffd18375
+				summarizeBy: sum
+				sourceColumn: item_revenue_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column item_revenue
+				dataType: double
+				lineageTag: 91610e53-d529-4701-8f7d-0ed63de85664
+				summarizeBy: sum
+				sourceColumn: item_revenue
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column item_refund_in_usd
+				dataType: double
+				lineageTag: 55f494c6-1c42-4ac8-ba8e-bfa5c04f1473
+				summarizeBy: sum
+				sourceColumn: item_refund_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column item_refund
+				dataType: double
+				lineageTag: 47c0eb97-0f59-4b7f-837c-142874557015
+				summarizeBy: sum
+				sourceColumn: item_refund
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column coupon
+				dataType: string
+				lineageTag: 5241f4e8-0d34-40de-9ec1-3d4c421e44c4
+				summarizeBy: none
+				sourceColumn: coupon
+
+				annotation SummarizationSetBy = Automatic
+
+			column affiliation
+				dataType: string
+				lineageTag: 3f2ca4c2-c9c8-42bc-a56f-0573434ac47f
+				summarizeBy: none
+				sourceColumn: affiliation
+
+				annotation SummarizationSetBy = Automatic
+
+			column location_id
+				dataType: string
+				lineageTag: f9a787e4-a595-411e-be71-d5d2f7a7c078
+				summarizeBy: none
+				sourceColumn: location_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_list_id
+				dataType: string
+				lineageTag: 338232f5-2e38-4d44-b08b-24a6a1ff10a7
+				summarizeBy: none
+				sourceColumn: item_list_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_list_name
+				dataType: string
+				lineageTag: d7408ee0-e9cc-483c-8a81-f49cdeb41a5a
+				summarizeBy: none
+				sourceColumn: item_list_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_list_index
+				dataType: string
+				lineageTag: acb68976-0b78-446d-b1e2-6a6c07b2e555
+				summarizeBy: none
+				sourceColumn: item_list_index
+
+				annotation SummarizationSetBy = Automatic
+
+			column promotion_id
+				dataType: string
+				lineageTag: 8636634a-74e1-4038-87ce-a16c62bca6e1
+				summarizeBy: none
+				sourceColumn: promotion_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column promotion_name
+				dataType: string
+				lineageTag: 8a8dd4a0-9019-4c9d-8dce-256eb87ee79a
+				summarizeBy: none
+				sourceColumn: promotion_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column creative_name
+				dataType: string
+				lineageTag: f0c46980-4edf-4d1c-a5d0-b8bd5202097d
+				summarizeBy: none
+				sourceColumn: creative_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column creative_slot
+				dataType: string
+				lineageTag: b0fb1982-d1ca-4177-a8f6-6e77adf431cc
+				summarizeBy: none
+				sourceColumn: creative_slot
+
+				annotation SummarizationSetBy = Automatic
+
+			partition fact_event_items = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    fact_event_items_View = ga4_marketing_dashboard_Schema{[Name="fact_event_items",Kind="View"]}[Data]
+						in
+						    fact_event_items_View
+
+		table fact_sessions
+			lineageTag: 9d237ce7-ef72-4ed8-94f5-ebc2e1fb51fa
+
+			column user_key
+				dataType: string
+				lineageTag: d1d5f9af-27f9-43fe-a7f9-735847244f44
+				summarizeBy: none
+				sourceColumn: user_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_id
+				dataType: int64
+				formatString: 0
+				lineageTag: 1292ca47-f383-4c5f-b1b1-8b017c9f82ed
+				summarizeBy: sum
+				sourceColumn: session_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column date_key
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: 3b83eddb-b35d-4e1e-98f9-120858147f95
+				summarizeBy: none
+				sourceColumn: date_key
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column session_start_ts
+				dataType: int64
+				formatString: 0
+				lineageTag: 8b050b10-3226-4419-a5a8-fcd695289cb5
+				summarizeBy: sum
+				sourceColumn: session_start_ts
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_end_ts
+				dataType: int64
+				formatString: 0
+				lineageTag: 3393394e-4c72-4e14-ae59-9a5c0eefcf7d
+				summarizeBy: sum
+				sourceColumn: session_end_ts
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_duration_seconds
+				dataType: int64
+				formatString: 0
+				lineageTag: 05883c40-35e2-4644-be31-c2492ddf91cc
+				summarizeBy: sum
+				sourceColumn: session_duration_seconds
+
+				annotation SummarizationSetBy = Automatic
+
+			column event_count
+				dataType: int64
+				formatString: 0
+				lineageTag: 699583c9-123e-4a7f-be1f-9d80fa5bcd41
+				summarizeBy: sum
+				sourceColumn: event_count
+
+				annotation SummarizationSetBy = Automatic
+
+			column has_purchase
+				dataType: boolean
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: 652e7b92-44e4-44ad-899d-10693bfe36b6
+				summarizeBy: none
+				sourceColumn: has_purchase
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_revenue_usd
+				dataType: double
+				lineageTag: afdf1ae2-b760-4023-9e3d-7dca01676b31
+				summarizeBy: sum
+				sourceColumn: session_revenue_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column is_engaged
+				dataType: boolean
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: ad61c044-fe97-43ae-bd31-db369ba2cb9d
+				summarizeBy: none
+				sourceColumn: is_engaged
+
+				annotation SummarizationSetBy = Automatic
+
+			column entrance_page
+				dataType: string
+				lineageTag: dc8c3216-369d-451f-bbcf-b7cc43071570
+				summarizeBy: none
+				sourceColumn: entrance_page
+
+				annotation SummarizationSetBy = Automatic
+
+			column device_key
+				dataType: string
+				lineageTag: 12a7bc09-1697-4572-b47a-0c5a54c09856
+				summarizeBy: none
+				sourceColumn: device_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column geo_key
+				dataType: string
+				lineageTag: be6a7f24-981c-4bea-90ef-c984dd5d8fdd
+				summarizeBy: none
+				sourceColumn: geo_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_source_key
+				dataType: string
+				lineageTag: 0d79c2c0-5938-4a60-b76a-7710708d10b4
+				summarizeBy: none
+				sourceColumn: traffic_source_key
+
+				annotation SummarizationSetBy = Automatic
+
+			partition fact_sessions = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    fact_sessions_View = ga4_marketing_dashboard_Schema{[Name="fact_sessions",Kind="View"]}[Data]
+						in
+						    fact_sessions_View
+
+		table fact_events
+			lineageTag: 8833ad14-6bfd-4a4b-8c85-540edd08219d
+
+			column event_id
+				dataType: string
+				lineageTag: bfca315e-a260-49c9-bc83-32c39745caec
+				summarizeBy: none
+				sourceColumn: event_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column date_key
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: ce2d7521-1fc2-4ed3-b093-a420fa2153b5
+				summarizeBy: none
+				sourceColumn: date_key
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column event_timestamp
+				dataType: int64
+				formatString: 0
+				lineageTag: 3d1c7e10-6765-421e-a1b9-d65af7fad7d0
+				summarizeBy: sum
+				sourceColumn: event_timestamp
+
+				annotation SummarizationSetBy = Automatic
+
+			column event_name
+				dataType: string
+				lineageTag: de125b45-c80c-4f45-be9f-bf12997bba03
+				summarizeBy: none
+				sourceColumn: event_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column event_previous_timestamp
+				dataType: int64
+				formatString: 0
+				lineageTag: 83b403f2-1fef-4280-aaa5-ca992b2b712b
+				summarizeBy: sum
+				sourceColumn: event_previous_timestamp
+
+				annotation SummarizationSetBy = Automatic
+
+			column event_value_in_usd
+				dataType: double
+				lineageTag: a32d3b71-8122-4d71-9d38-8658fecc7b11
+				summarizeBy: sum
+				sourceColumn: event_value_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column event_bundle_sequence_id
+				dataType: int64
+				formatString: 0
+				lineageTag: 0252ab44-108b-4318-8f91-c8d64fb48804
+				summarizeBy: sum
+				sourceColumn: event_bundle_sequence_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column event_server_timestamp_offset
+				dataType: int64
+				formatString: 0
+				lineageTag: 5848b306-eee1-4468-b635-916c9a191be0
+				summarizeBy: sum
+				sourceColumn: event_server_timestamp_offset
+
+				annotation SummarizationSetBy = Automatic
+
+			column user_id
+				dataType: string
+				lineageTag: 2bc0f39a-444c-4fb5-83bc-4ca321e2ea2a
+				summarizeBy: none
+				sourceColumn: user_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column user_key
+				dataType: string
+				lineageTag: 538405a3-6143-4a66-bc4c-6b8b1df4c7f8
+				summarizeBy: none
+				sourceColumn: user_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column user_first_touch_timestamp
+				dataType: int64
+				formatString: 0
+				lineageTag: e13f416e-0d43-4ae0-a666-bd799927d17b
+				summarizeBy: sum
+				sourceColumn: user_first_touch_timestamp
+
+				annotation SummarizationSetBy = Automatic
+
+			column user_ltv_revenue
+				dataType: double
+				lineageTag: addc19fc-a07d-4a86-85cc-f8c8bac55b7a
+				summarizeBy: sum
+				sourceColumn: user_ltv_revenue
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column user_ltv_currency
+				dataType: string
+				lineageTag: 34786654-4137-49fc-8b6a-a73e171127d2
+				summarizeBy: none
+				sourceColumn: user_ltv_currency
+
+				annotation SummarizationSetBy = Automatic
+
+			column analytics_storage
+				dataType: int64
+				formatString: 0
+				lineageTag: 37aa0fe2-8afb-4fce-9a05-7c599c7139f0
+				summarizeBy: sum
+				sourceColumn: analytics_storage
+
+				annotation SummarizationSetBy = Automatic
+
+			column ads_storage
+				dataType: int64
+				formatString: 0
+				lineageTag: c444f24f-3227-4433-98ec-f88f57e18686
+				summarizeBy: sum
+				sourceColumn: ads_storage
+
+				annotation SummarizationSetBy = Automatic
+
+			column uses_transient_token
+				dataType: string
+				lineageTag: da320bac-5da9-4812-b1ea-68b5e89abad6
+				summarizeBy: none
+				sourceColumn: uses_transient_token
+
+				annotation SummarizationSetBy = Automatic
+
+			column device_key
+				dataType: string
+				lineageTag: 50b9aa11-295a-45a7-b457-f3cf41de08af
+				summarizeBy: none
+				sourceColumn: device_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column geo_key
+				dataType: string
+				lineageTag: 60d70d7f-5919-4db0-b35e-65824bb24f31
+				summarizeBy: none
+				sourceColumn: geo_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_source_key
+				dataType: string
+				lineageTag: a2b994b1-441d-4f83-902d-09c0f7dbc096
+				summarizeBy: none
+				sourceColumn: traffic_source_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column app_info_key
+				dataType: string
+				lineageTag: 9f52a81d-a12e-44a5-9ec2-70344feb4ee6
+				summarizeBy: none
+				sourceColumn: app_info_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column device_category
+				dataType: string
+				lineageTag: d3b99c66-a0b4-4c75-90a4-27dd641f8166
+				summarizeBy: none
+				sourceColumn: device_category
+
+				annotation SummarizationSetBy = Automatic
+
+			column mobile_brand_name
+				dataType: string
+				lineageTag: 093020fd-3987-4049-9b27-7e8e6a7707ab
+				summarizeBy: none
+				sourceColumn: mobile_brand_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column mobile_model_name
+				dataType: string
+				lineageTag: 63e16204-0736-46a4-93bb-9cc11cf1435f
+				summarizeBy: none
+				sourceColumn: mobile_model_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column mobile_marketing_name
+				dataType: string
+				lineageTag: 1c98b88d-8dd4-4050-877e-fde42f4737d3
+				summarizeBy: none
+				sourceColumn: mobile_marketing_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column operating_system
+				dataType: string
+				lineageTag: 5c912e58-7716-475e-a85b-3dc93694dc1f
+				summarizeBy: none
+				sourceColumn: operating_system
+
+				annotation SummarizationSetBy = Automatic
+
+			column operating_system_version
+				dataType: string
+				lineageTag: f603ccc5-9e79-47de-8b9f-98d68973540b
+				summarizeBy: none
+				sourceColumn: operating_system_version
+
+				annotation SummarizationSetBy = Automatic
+
+			column language
+				dataType: string
+				lineageTag: ff55949f-856c-465c-8db6-3a665c5c49f7
+				summarizeBy: none
+				sourceColumn: language
+
+				annotation SummarizationSetBy = Automatic
+
+			column is_limited_ad_tracking
+				dataType: string
+				lineageTag: 7b87f24f-e388-4936-8555-88eee813788a
+				summarizeBy: none
+				sourceColumn: is_limited_ad_tracking
+
+				annotation SummarizationSetBy = Automatic
+
+			column browser
+				dataType: string
+				lineageTag: 68c9dc80-c759-444a-9ea7-275e2693f4d0
+				summarizeBy: none
+				sourceColumn: browser
+
+				annotation SummarizationSetBy = Automatic
+
+			column browser_version
+				dataType: string
+				lineageTag: 2ec4d89c-ecc4-486d-bd09-42e9043248b4
+				summarizeBy: none
+				sourceColumn: browser_version
+
+				annotation SummarizationSetBy = Automatic
+
+			column continent
+				dataType: string
+				lineageTag: 5570f91a-20ec-40b4-87ef-769515e52279
+				summarizeBy: none
+				sourceColumn: continent
+
+				annotation SummarizationSetBy = Automatic
+
+			column sub_continent
+				dataType: string
+				lineageTag: ee5d2d1c-a882-4520-ab7e-838ccdbf2a34
+				summarizeBy: none
+				sourceColumn: sub_continent
+
+				annotation SummarizationSetBy = Automatic
+
+			column country
+				dataType: string
+				lineageTag: 432fef42-fb10-4827-bd7d-93c4aef0f546
+				summarizeBy: none
+				sourceColumn: country
+
+				annotation SummarizationSetBy = Automatic
+
+			column region
+				dataType: string
+				lineageTag: 7ff8055b-3214-4ce3-a9a4-53570fae8355
+				summarizeBy: none
+				sourceColumn: region
+
+				annotation SummarizationSetBy = Automatic
+
+			column city
+				dataType: string
+				lineageTag: 4b6e53d4-e489-4175-b1f5-b83e054b3e70
+				summarizeBy: none
+				sourceColumn: city
+
+				annotation SummarizationSetBy = Automatic
+
+			column metro
+				dataType: string
+				lineageTag: fb783145-c1dd-441b-ad2b-bb3cc09f32b9
+				summarizeBy: none
+				sourceColumn: metro
+
+				annotation SummarizationSetBy = Automatic
+
+			column app_id
+				dataType: string
+				lineageTag: f2b07b07-4744-4ec6-901c-b636322fe32b
+				summarizeBy: none
+				sourceColumn: app_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column app_version
+				dataType: string
+				lineageTag: e9c268f9-210f-4276-81fa-15973a30fa6f
+				summarizeBy: none
+				sourceColumn: app_version
+
+				annotation SummarizationSetBy = Automatic
+
+			column install_store
+				dataType: string
+				lineageTag: 73ad0812-56ea-4403-abf7-89d5df9ff5a7
+				summarizeBy: none
+				sourceColumn: install_store
+
+				annotation SummarizationSetBy = Automatic
+
+			column firebase_app_id
+				dataType: string
+				lineageTag: 5573455c-45e9-4f02-a3ef-e801e325e2c1
+				summarizeBy: none
+				sourceColumn: firebase_app_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column install_source
+				dataType: string
+				lineageTag: 06f502f6-c88e-4a89-b7e3-73b05752be45
+				summarizeBy: none
+				sourceColumn: install_source
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_medium
+				dataType: string
+				lineageTag: c983172b-4b71-4dab-b703-4e96f7bb8db5
+				summarizeBy: none
+				sourceColumn: traffic_medium
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_campaign
+				dataType: string
+				lineageTag: 83320aae-5685-4f7a-b663-76b057d58a04
+				summarizeBy: none
+				sourceColumn: traffic_campaign
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_source
+				dataType: string
+				lineageTag: 845ce14a-9ae9-4b69-b043-11828a8dac0a
+				summarizeBy: none
+				sourceColumn: traffic_source
+
+				annotation SummarizationSetBy = Automatic
+
+			column stream_id
+				dataType: int64
+				formatString: 0
+				lineageTag: 24a029c5-fd58-4b56-a267-aca8a3721a26
+				summarizeBy: sum
+				sourceColumn: stream_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column platform
+				dataType: string
+				lineageTag: f5629752-a701-4c36-95e9-8b334116e311
+				summarizeBy: none
+				sourceColumn: platform
+
+				annotation SummarizationSetBy = Automatic
+
+			column hostname
+				dataType: string
+				lineageTag: 885a84dd-0bd4-4bcc-9c53-b775a2fa9885
+				summarizeBy: none
+				sourceColumn: hostname
+
+				annotation SummarizationSetBy = Automatic
+
+			column total_item_quantity
+				dataType: int64
+				formatString: 0
+				lineageTag: 1808f654-71aa-4b6a-aa62-0f078c3195d6
+				summarizeBy: sum
+				sourceColumn: total_item_quantity
+
+				annotation SummarizationSetBy = Automatic
+
+			column purchase_revenue_in_usd
+				dataType: double
+				lineageTag: 0319ef1b-eb20-4c22-a673-1e9852a5ba6d
+				summarizeBy: sum
+				sourceColumn: purchase_revenue_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column purchase_revenue
+				dataType: double
+				lineageTag: cac5d4a2-8033-4956-986b-dc4761d796ca
+				summarizeBy: sum
+				sourceColumn: purchase_revenue
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column refund_value_in_usd
+				dataType: double
+				lineageTag: 1bfa8f9c-ad9a-497f-aeca-93939751cfdc
+				summarizeBy: sum
+				sourceColumn: refund_value_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column refund_value
+				dataType: double
+				lineageTag: 928e28ab-6470-4712-b147-76025abc16db
+				summarizeBy: sum
+				sourceColumn: refund_value
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column shipping_value_in_usd
+				dataType: double
+				lineageTag: 3e801cb4-f765-4554-b78e-262f94a691fb
+				summarizeBy: sum
+				sourceColumn: shipping_value_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column shipping_value
+				dataType: double
+				lineageTag: c5125212-192a-4c36-a2ae-c6f7c1363e1b
+				summarizeBy: sum
+				sourceColumn: shipping_value
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column tax_value_in_usd
+				dataType: double
+				lineageTag: 82974735-100a-4120-b109-a803dd19cc54
+				summarizeBy: sum
+				sourceColumn: tax_value_in_usd
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column tax_value
+				dataType: double
+				lineageTag: 40f0f401-563d-441c-abbf-56278a5f953f
+				summarizeBy: sum
+				sourceColumn: tax_value
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column unique_items
+				dataType: int64
+				formatString: 0
+				lineageTag: bb1335ce-bdf3-4b6a-a56a-1eb54f0eccf7
+				summarizeBy: sum
+				sourceColumn: unique_items
+
+				annotation SummarizationSetBy = Automatic
+
+			column transaction_id
+				dataType: string
+				lineageTag: 006857e3-001c-41fc-9034-8502f54a41ed
+				summarizeBy: none
+				sourceColumn: transaction_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column page_location
+				dataType: string
+				lineageTag: 3375b9c1-82b6-4ef0-a73b-0886887009cb
+				summarizeBy: none
+				sourceColumn: page_location
+
+				annotation SummarizationSetBy = Automatic
+
+			column page_title
+				dataType: string
+				lineageTag: 337689d8-5c07-4db1-8dfc-8e0609c6040b
+				summarizeBy: none
+				sourceColumn: page_title
+
+				annotation SummarizationSetBy = Automatic
+
+			column page_referrer
+				dataType: string
+				lineageTag: c2216d24-c456-4f5a-8d60-1a3a9f2976ae
+				summarizeBy: none
+				sourceColumn: page_referrer
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_id
+				dataType: int64
+				formatString: 0
+				lineageTag: 929b36ee-76c4-4e58-a4a6-9c024916e6a6
+				summarizeBy: sum
+				sourceColumn: session_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_number
+				dataType: int64
+				formatString: 0
+				lineageTag: 3ff6d3c3-9098-44d1-90e4-827f3638589b
+				summarizeBy: sum
+				sourceColumn: session_number
+
+				annotation SummarizationSetBy = Automatic
+
+			column engagement_time_msec
+				dataType: int64
+				formatString: 0
+				lineageTag: 2b2e3a8c-f255-4e7d-a6d3-416ef843313b
+				summarizeBy: sum
+				sourceColumn: engagement_time_msec
+
+				annotation SummarizationSetBy = Automatic
+
+			column is_entrance
+				dataType: int64
+				formatString: 0
+				lineageTag: a5904dae-eb17-478e-b71d-a9765c40ccaf
+				summarizeBy: sum
+				sourceColumn: is_entrance
+
+				annotation SummarizationSetBy = Automatic
+
+			column session_engaged
+				dataType: string
+				lineageTag: 4449b4a7-053a-44b2-b10e-b0a2c2af93c1
+				summarizeBy: none
+				sourceColumn: session_engaged
+
+				annotation SummarizationSetBy = Automatic
+
+			partition fact_events = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    fact_events_Table = ga4_marketing_dashboard_Schema{[Name="fact_events",Kind="Table"]}[Data]
+						in
+						    fact_events_Table
+
+		table dim_user
+			lineageTag: 07c48631-7e09-445a-b52e-14ac2e7c08d7
+
+			column user_key
+				dataType: string
+				lineageTag: 2595a217-81d6-4102-b50e-02cb817e8f07
+				summarizeBy: none
+				sourceColumn: user_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column user_id
+				dataType: string
+				lineageTag: 98721a2b-f41a-4cd4-8a5e-e002d1ebe530
+				summarizeBy: none
+				sourceColumn: user_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column first_touch_timestamp
+				dataType: dateTime
+				formatString: General Date
+				lineageTag: cce53011-6cd9-4845-a123-c86c85f22fe4
+				summarizeBy: none
+				sourceColumn: first_touch_timestamp
+
+				annotation SummarizationSetBy = Automatic
+
+			column first_seen_date
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: 78ee60c2-04b6-4bb9-9974-2834823943db
+				summarizeBy: none
+				sourceColumn: first_seen_date
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column last_seen_date
+				dataType: dateTime
+				formatString: Long Date
+				lineageTag: 2b214c28-a554-4c0f-91cc-f8eeb5277a85
+				summarizeBy: none
+				sourceColumn: last_seen_date
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column user_ltv_revenue
+				dataType: double
+				lineageTag: 2ed35c66-f013-4e7f-a942-321632bafd0a
+				summarizeBy: sum
+				sourceColumn: user_ltv_revenue
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+			column user_ltv_currency
+				dataType: string
+				lineageTag: 849a33a5-aa01-4ccf-81ef-7fa637e40c1a
+				summarizeBy: none
+				sourceColumn: user_ltv_currency
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_user = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_user_Table = ga4_marketing_dashboard_Schema{[Name="dim_user",Kind="Table"]}[Data]
+						in
+						    dim_user_Table
+
+		table dim_traffic_source
+			lineageTag: 4394b324-b458-4245-8bcb-a8caf3aa6720
+
+			column traffic_source_key
+				dataType: string
+				lineageTag: a4c8025e-9ef4-41a1-84fe-9dca26352ba1
+				summarizeBy: none
+				sourceColumn: traffic_source_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_medium
+				dataType: string
+				lineageTag: dfe956a0-262c-4019-8c05-7d41aaaf9787
+				summarizeBy: none
+				sourceColumn: traffic_medium
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_campaign
+				dataType: string
+				lineageTag: cb15c0aa-5576-4472-898a-380819211bf7
+				summarizeBy: none
+				sourceColumn: traffic_campaign
+
+				annotation SummarizationSetBy = Automatic
+
+			column traffic_source
+				dataType: string
+				lineageTag: b98d920c-75a1-4b9e-b03f-068755617011
+				summarizeBy: none
+				sourceColumn: traffic_source
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_traffic_source = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_traffic_source_Table = ga4_marketing_dashboard_Schema{[Name="dim_traffic_source",Kind="Table"]}[Data]
+						in
+						    dim_traffic_source_Table
+
+		table dim_item
+			lineageTag: 26b11db9-a724-4fae-8713-d3090afe80d8
+
+			column item_key
+				dataType: string
+				lineageTag: dc2a5778-aa4e-4f6b-ac92-21cb5c5db102
+				summarizeBy: none
+				sourceColumn: item_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_name
+				dataType: string
+				lineageTag: f990a4ae-a283-465c-81a9-c70249cdccf2
+				summarizeBy: none
+				sourceColumn: item_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_brand
+				dataType: string
+				lineageTag: 8a62cbbf-cb26-41f3-99ee-126ce9e6ad81
+				summarizeBy: none
+				sourceColumn: item_brand
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_variant
+				dataType: string
+				lineageTag: 12b2202e-3751-49f5-95e0-1b95db3691e5
+				summarizeBy: none
+				sourceColumn: item_variant
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_category
+				dataType: string
+				lineageTag: 26b1f2e8-c9b5-40b3-9f16-01215b87817f
+				summarizeBy: none
+				sourceColumn: item_category
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_category2
+				dataType: string
+				lineageTag: 3fddb3d5-902d-4c11-a060-a98497a56f7c
+				summarizeBy: none
+				sourceColumn: item_category2
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_category3
+				dataType: string
+				lineageTag: b116dac3-7899-455c-8fe0-52c6bbb0c3f4
+				summarizeBy: none
+				sourceColumn: item_category3
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_category4
+				dataType: string
+				lineageTag: 2fa67f6a-161a-4a1b-b833-0eebfc431847
+				summarizeBy: none
+				sourceColumn: item_category4
+
+				annotation SummarizationSetBy = Automatic
+
+			column item_category5
+				dataType: string
+				lineageTag: a953d804-052e-4940-90ec-62c0fd4ad96d
+				summarizeBy: none
+				sourceColumn: item_category5
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_item = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_item_Table = ga4_marketing_dashboard_Schema{[Name="dim_item",Kind="Table"]}[Data]
+						in
+						    dim_item_Table
+
+		table dim_geo
+			lineageTag: 8329259b-8ef6-4827-867a-1f7e87d95bb1
+
+			column geo_key
+				dataType: string
+				lineageTag: c6a7ae90-f3bf-4369-bdf4-64c518be2d5b
+				summarizeBy: none
+				sourceColumn: geo_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column continent
+				dataType: string
+				lineageTag: fa3f95ea-c779-498c-8ea9-14f846828d35
+				summarizeBy: none
+				sourceColumn: continent
+
+				annotation SummarizationSetBy = Automatic
+
+			column sub_continent
+				dataType: string
+				lineageTag: f170db2e-8311-4785-b556-bec1ee89c285
+				summarizeBy: none
+				sourceColumn: sub_continent
+
+				annotation SummarizationSetBy = Automatic
+
+			column country
+				dataType: string
+				lineageTag: 0f1cf50a-fa45-4433-86c4-e5ada315f1e2
+				summarizeBy: none
+				sourceColumn: country
+
+				annotation SummarizationSetBy = Automatic
+
+			column region
+				dataType: string
+				lineageTag: 9b2341a1-8d32-44bd-af91-eaf6833bee8a
+				summarizeBy: none
+				sourceColumn: region
+
+				annotation SummarizationSetBy = Automatic
+
+			column city
+				dataType: string
+				lineageTag: 0f2453a9-8d3e-4bd0-bf8c-8766c1040978
+				summarizeBy: none
+				sourceColumn: city
+
+				annotation SummarizationSetBy = Automatic
+
+			column metro
+				dataType: string
+				lineageTag: b7d157c0-0137-42a7-b04d-4a8b8e07a3b2
+				summarizeBy: none
+				sourceColumn: metro
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_geo = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_geo_Table = ga4_marketing_dashboard_Schema{[Name="dim_geo",Kind="Table"]}[Data]
+						in
+						    dim_geo_Table
+
+		table dim_device
+			lineageTag: e267f21e-a1db-478c-9885-d6f4c00eb1b7
+
+			column device_key
+				dataType: string
+				lineageTag: 34c9a6b2-6a44-47fe-856c-fdde1d55a146
+				summarizeBy: none
+				sourceColumn: device_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column device_category
+				dataType: string
+				lineageTag: d6e202dd-3ada-4559-b689-fcdc0f479c5b
+				summarizeBy: none
+				sourceColumn: device_category
+
+				annotation SummarizationSetBy = Automatic
+
+			column mobile_brand_name
+				dataType: string
+				lineageTag: 3785e115-8a3c-4c28-aa14-a8a82a5fb67a
+				summarizeBy: none
+				sourceColumn: mobile_brand_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column mobile_model_name
+				dataType: string
+				lineageTag: 21fd9de6-cfeb-4515-962c-a4eaf9ea7133
+				summarizeBy: none
+				sourceColumn: mobile_model_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column mobile_marketing_name
+				dataType: string
+				lineageTag: 219eabdd-aab7-43c3-8fdc-1521e2431469
+				summarizeBy: none
+				sourceColumn: mobile_marketing_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column operating_system
+				dataType: string
+				lineageTag: cf7aaf74-9128-4a0a-b37b-5a014290a387
+				summarizeBy: none
+				sourceColumn: operating_system
+
+				annotation SummarizationSetBy = Automatic
+
+			column operating_system_version
+				dataType: string
+				lineageTag: fcc367c3-bad4-4d72-8d18-e48990986eb3
+				summarizeBy: none
+				sourceColumn: operating_system_version
+
+				annotation SummarizationSetBy = Automatic
+
+			column language
+				dataType: string
+				lineageTag: fef26677-3bfc-4eb2-9e5e-3b4bd952f482
+				summarizeBy: none
+				sourceColumn: language
+
+				annotation SummarizationSetBy = Automatic
+
+			column is_limited_ad_tracking
+				dataType: string
+				lineageTag: 540b55e5-72e4-447e-abc2-cd79e1fa0103
+				summarizeBy: none
+				sourceColumn: is_limited_ad_tracking
+
+				annotation SummarizationSetBy = Automatic
+
+			column browser
+				dataType: string
+				lineageTag: 9ab71206-f111-4725-9b50-1f50feb6cc2a
+				summarizeBy: none
+				sourceColumn: browser
+
+				annotation SummarizationSetBy = Automatic
+
+			column browser_version
+				dataType: string
+				lineageTag: 6c231255-3c8a-4ad1-9cb2-d3f5eb1d5da4
+				summarizeBy: none
+				sourceColumn: browser_version
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_device = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_device_Table = ga4_marketing_dashboard_Schema{[Name="dim_device",Kind="Table"]}[Data]
+						in
+						    dim_device_Table
+
+		table dim_date
+			lineageTag: 9d3fef3f-b64f-4b2a-9ed9-3f06e49d42dd
+			dataCategory: Time
+
+			column date_key
+				dataType: dateTime
+				isUnique
+				isKey
+				formatString: Short Date
+				lineageTag: 5675261b-4bd3-42cc-a85b-7f9f057ad130
+				summarizeBy: none
+				sourceColumn: date_key
+
+				annotation SummarizationSetBy = Automatic
+
+				annotation UnderlyingDateTimeDataType = Date
+
+			column year
+				dataType: int64
+				formatString: 0
+				lineageTag: 7534afad-a859-4279-84ff-5805dc695fe4
+				summarizeBy: sum
+				sourceColumn: year
+
+				annotation SummarizationSetBy = Automatic
+
+			column quarter
+				dataType: int64
+				formatString: 0
+				lineageTag: 8aed62d2-43bd-4bf0-bdff-58e5e35fe366
+				summarizeBy: sum
+				sourceColumn: quarter
+
+				annotation SummarizationSetBy = Automatic
+
+			column month
+				dataType: int64
+				formatString: 0
+				lineageTag: 87f49e8a-eea3-4fe4-a974-7c0a5c5621da
+				summarizeBy: sum
+				sourceColumn: month
+
+				annotation SummarizationSetBy = Automatic
+
+			column month_name
+				dataType: string
+				lineageTag: 55403768-6d8a-4281-ad19-9a0ab7af4963
+				summarizeBy: none
+				sourceColumn: month_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column day
+				dataType: int64
+				formatString: 0
+				lineageTag: 708034e7-d18e-4904-a3cf-78bca01416ee
+				summarizeBy: sum
+				sourceColumn: day
+
+				annotation SummarizationSetBy = Automatic
+
+			column day_name
+				dataType: string
+				lineageTag: 1df6a356-f45e-4d01-b6e8-7c85e42a86e8
+				summarizeBy: none
+				sourceColumn: day_name
+
+				annotation SummarizationSetBy = Automatic
+
+			column is_weekend
+				dataType: boolean
+				formatString: """TRUE"";""TRUE"";""FALSE"""
+				lineageTag: ff568750-94bd-418b-8f1a-84419d53f5bb
+				summarizeBy: none
+				sourceColumn: is_weekend
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_date = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_date_Table = ga4_marketing_dashboard_Schema{[Name="dim_date",Kind="Table"]}[Data]
+						in
+						    dim_date_Table
+
+		table dim_app_info
+			lineageTag: 4bffc70d-d4ea-45c5-98a2-b3d2eb8cbbe2
+
+			column app_info_key
+				dataType: string
+				lineageTag: 13b873e1-359c-4831-8277-59a8a4fc89c8
+				summarizeBy: none
+				sourceColumn: app_info_key
+
+				annotation SummarizationSetBy = Automatic
+
+			column app_id
+				dataType: string
+				lineageTag: 32f66715-a878-4032-9292-a031b82eca5c
+				summarizeBy: none
+				sourceColumn: app_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column app_version
+				dataType: string
+				lineageTag: bce3a856-5707-4c9d-982d-54770d5ce84f
+				summarizeBy: none
+				sourceColumn: app_version
+
+				annotation SummarizationSetBy = Automatic
+
+			column install_store
+				dataType: string
+				lineageTag: b67f3d33-ceb5-4931-a308-474afc65635e
+				summarizeBy: none
+				sourceColumn: install_store
+
+				annotation SummarizationSetBy = Automatic
+
+			column firebase_app_id
+				dataType: string
+				lineageTag: 0ff5f5e8-179e-4370-90a3-9d84e8df8756
+				summarizeBy: none
+				sourceColumn: firebase_app_id
+
+				annotation SummarizationSetBy = Automatic
+
+			column install_source
+				dataType: string
+				lineageTag: 2116d884-543d-4618-a058-55c222bd8e27
+				summarizeBy: none
+				sourceColumn: install_source
+
+				annotation SummarizationSetBy = Automatic
+
+			partition dim_app_info = m
+				mode: import
+				source =
+						let
+						    Source = GoogleBigQuery.Database([Implementation="2.0"]),
+						    #"g-sheet-475422_Database" = Source{[Name="g-sheet-475422",Kind="Database"]}[Data],
+						    ga4_marketing_dashboard_Schema = #"g-sheet-475422_Database"{[Name="ga4_marketing_dashboard",Kind="Schema"]}[Data],
+						    dim_app_info_Table = ga4_marketing_dashboard_Schema{[Name="dim_app_info",Kind="Table"]}[Data]
+						in
+						    dim_app_info_Table
+
+			annotation PBI_NavigationStepName = Navigation
+
+			annotation PBI_ResultType = Table
+
+		table #_Measures_
+			lineageTag: be05c863-c494-4a19-ada4-ccf8a1348cfa
+
+			measure 'Total users' = DISTINCTCOUNT ( fact_events[user_key] )
+				formatString: #,0
+				displayFolder: User Acquisition\Base
+				lineageTag: d9a6ab74-9a28-443e-a106-f613928e4bf9
+
+			measure 'New users' =
+					CALCULATE (
+					    DISTINCTCOUNT ( fact_events[user_key] ),
+					    fact_events[event_name] IN { "first_visit", "first_open" }
+					)
+				formatString: #,0
+				displayFolder: User Acquisition\Base
+				lineageTag: dfbe613b-78b7-4e28-9c9f-805381298a01
+
+			measure Sessions = COUNTROWS ( fact_sessions )
+				formatString: #,0
+				displayFolder: User Acquisition\Base
+				lineageTag: b40c4403-c5dd-4b96-860c-ed5140c02539
+
+			measure 'Ecommerce purchases' =
+					CALCULATE (
+					    COUNTROWS ( fact_events ),
+					    fact_events[event_name] = "purchase"
+					)
+				formatString: #,0
+				displayFolder: User Acquisition\Base
+				lineageTag: bc19f75b-3bf2-4a5f-98e8-74353c063acf
+
+			measure 'Purchase revenue' = SUM ( fact_events[purchase_revenue_in_usd] )
+				formatString: \$#,0.00
+				displayFolder: User Acquisition\Base
+				lineageTag: 3298ab7a-5747-4fd0-a4c4-62d3e3d396f3
+
+			measure ECVR = DIVIDE ( [Ecommerce purchases], [Sessions] )
+				formatString: 0.00%
+				displayFolder: User Acquisition\Base
+				lineageTag: 3d447204-4598-44a3-9baa-51431ce93e01
+
+			measure '% of Users' =
+					DIVIDE (
+					    [Total users],
+					    CALCULATE ( [Total users], ALLSELECTED ( dim_traffic_source ) )
+					)
+				formatString: 0.00%
+				displayFolder: User Acquisition\Share of total
+				lineageTag: cd615eb9-8246-4d65-a498-219a2e273a87
+
+			measure '% New Users' =
+					DIVIDE (
+					    [New users],
+					    CALCULATE ( [New users], ALLSELECTED ( dim_traffic_source ) )
+					)
+				formatString: 0.00%
+				displayFolder: User Acquisition\Share of total
+				lineageTag: 43512097-e8fd-4e82-bb22-fbc4e93a6e9e
+
+			measure '% Revenue' =
+					DIVIDE (
+					    [Purchase revenue],
+					    CALCULATE ( [Purchase revenue], ALLSELECTED ( dim_traffic_source ) )
+					)
+				formatString: 0.00%
+				displayFolder: User Acquisition\Share of total
+				lineageTag: 7ed77bf6-3884-42e6-ac05-2a3039aba8ea
+
+			measure 'KPI Value' =
+					SWITCH (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					    0, [Total users],
+					    1, [New users],
+					    2, [Ecommerce purchases],
+					    3, [ECVR],
+					    4, [Purchase revenue]
+					)
+				displayFolder: User Acquisition\KPI Selector
+				lineageTag: 0c070b45-939b-45d8-bd3d-eaefd78706d7
+
+				formatStringDefinition =
+						SWITCH (
+						    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+						    3, "0.00%",
+						    4, "\$#,0",
+						    "#,0"
+						)
+
+			measure 'KPI Delta' =
+					SWITCH (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					    0, [Total users Change %],
+					    1, [New users Change %],
+					    2, [Ecommerce purchases Change %],
+					    3, [ECVR Change %],
+					    4, [Purchase revenue Change %]
+					)
+				formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+				displayFolder: User Acquisition\KPI Selector
+				lineageTag: 5fb0fc38-892a-44ef-a9fd-a3bad98f9589
+
+			measure 'KPI Chart Title' =
+					"Daily " & SWITCH (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					    0, "total users",
+					    1, "new users",
+					    2, "ecommerce purchases",
+					    3, "ECVR",
+					    4, "purchase revenue",
+					    "KPIs"
+					)
+				displayFolder: User Acquisition\KPI Selector
+				lineageTag: 0f461d90-8eaa-4366-b296-98e53ec0b80e
+
+			measure 'KPI Card SVG' =
+					
+					VAR _KPIOrder =
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] )
+					
+					-- Configuration
+					VAR _W = 180
+					VAR _H = 100
+					
+					-- Calculations
+					VAR _KPIName =
+					    SWITCH (
+					        _KPIOrder,
+					        0, "Total users",
+					        1, "New users",
+					        2, "Ecommerce purchases",
+					        3, "ECVR",
+					        4, "Purchase revenue",
+					        "KPI"
+					    )
+					
+					VAR _KPIValue = [KPI Value]
+					VAR _KPIDelta = [KPI Delta]
+					
+					VAR _FormattedValue =
+					    SWITCH (
+					        _KPIOrder,
+					        0, FORMAT ( _KPIValue, "#,##0" ),
+					        1, FORMAT ( _KPIValue, "#,##0" ),
+					        2, FORMAT ( _KPIValue, "#,##0" ),
+					        3, FORMAT ( _KPIValue, "0.00%" ),
+					        4, FORMAT ( _KPIValue, "$#,##0,.0K" ),
+					        FORMAT ( _KPIValue, "#,##0.##" )
+					    )
+					
+					VAR _FormattedValueEncoded =
+					    SUBSTITUTE (
+					        SUBSTITUTE ( _FormattedValue, "%", "%25" ),
+					        "+", "%2B"
+					    )
+					
+					VAR _FormattedDelta =
+					    FORMAT ( _KPIDelta, "+0.0%;-0.0%;0.0%" )
+					
+					VAR _DeltaRaw =
+					    IF (
+					        ISBLANK ( _KPIDelta ),
+					        "N/A",
+					        _FormattedDelta
+					    )
+					
+					VAR _DeltaTextEncoded =
+					    SUBSTITUTE (
+					        SUBSTITUTE (
+					            SUBSTITUTE ( _DeltaRaw, "%", "%25" ),
+					            "+", "%2B"
+					        ),
+					        " ", "%20"
+					    )
+					
+					-- Colors
+					VAR _LabelColor = "%2364778F" -- Muted slate
+					VAR _ValueColor = "%23041225" -- Dark navy
+					VAR _CardBackground = "%23FFFFFF" -- White
+					
+					VAR _DeltaColor =
+					    SWITCH (
+					        TRUE (),
+					        ISBLANK ( _KPIDelta ), "%2364778F",
+					        _KPIDelta > 0, "%230057CE",
+					        _KPIDelta < 0, "%23D51A9F",
+					        "%2364778F"
+					    )
+					
+					VAR _DeltaFill =
+					    SWITCH (
+					        TRUE (),
+					        ISBLANK ( _KPIDelta ), "%23F3F6FA",
+					        _KPIDelta > 0, "%23EAF2FF",
+					        _KPIDelta < 0, "%23FCEAF5",
+					        "%23F3F6FA"
+					    )
+					
+					VAR _DeltaArrow =
+					    SWITCH (
+					        TRUE (),
+					        ISBLANK ( _KPIDelta ), "",
+					        _KPIDelta > 0, "&%239650;",
+					        _KPIDelta < 0, "&%239660;",
+					        ""
+					    )
+					
+					VAR _DeltaDisplay =
+					    IF (
+					        ISBLANK ( _KPIDelta ),
+					        "N/A",
+					        IF (
+					            _DeltaArrow <> "",
+					            _DeltaArrow & "%20" & _DeltaTextEncoded,
+					            _DeltaTextEncoded
+					        )
+					    )
+					
+					-- Geometry: adapt typography and positioning to the value
+					VAR _ValueFontSize =
+					    SWITCH (
+					        TRUE (),
+					        LEN ( _FormattedValue ) >= 13, 13,
+					        LEN ( _FormattedValue ) >= 10, 18,
+					        LEN ( _FormattedValue ) >= 8, 20,
+					        24
+					    )
+					
+					VAR _EstimatedValueWidth =
+					    LEN ( _FormattedValue ) * _ValueFontSize * 0.64
+					
+					VAR _DeltaX =
+					    12 + _EstimatedValueWidth + 4
+					
+					VAR _DeltaXText =
+					    FORMAT ( _DeltaX, "0" )
+					
+					VAR _DeltaCenterX =
+					    FORMAT ( _DeltaX + 34, "0" )
+					
+					-- SVG
+					VAR _SVG =
+					    "<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='-2 -2 184 104' overflow='visible' display='block'>"
+					        & "<rect x='1' y='1' width='178' height='98' rx='7' fill='" & _CardBackground & "'/>"
+					        & "<text x='12' y='26' font-family='Segoe UI,Arial,sans-serif' font-size='14' font-weight='500' fill='" & _LabelColor & "'>"
+					        & _KPIName
+					        & "</text>"
+					        & "<text x='12' y='63' font-family='Segoe UI,Arial,sans-serif' font-size='" & FORMAT ( _ValueFontSize, "0" ) & "' font-weight='600' fill='" & _ValueColor & "'>"
+					        & _FormattedValueEncoded
+					        & "</text>"
+					        & "<rect x='" & _DeltaXText & "' y='43' width='68' height='22' rx='5' fill='" & _DeltaFill & "'/>"
+					        & "<text x='" & _DeltaCenterX & "' y='58' text-anchor='middle' font-family='Segoe UI,Arial,sans-serif' font-size='11' font-weight='600' fill='" & _DeltaColor & "'>"
+					        & _DeltaDisplay
+					        & "</text>"
+					        & "</svg>"
+					
+					RETURN
+					    IF (
+					        HASONEVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					        "data:image/svg+xml;charset=utf-8," & _SVG,
+					        BLANK ()
+					    )
+				lineageTag: ae5cf1d5-9f82-4e82-8527-7e46bdff8a93
+				dataCategory: ImageUrl
+
+			measure '</> Slicer Filter' = ```
+					INT( NOT ISEMPTY( fact_sessions ) )    // replace it with your own fact table
+					
+					```
+				formatString: 0
+				lineageTag: 8f598c12-6270-48a8-b944-02737b969db0
+
+			/// First day of the range selected in the date slicer (read even inside a daily axis).
+			measure 'Period Start' = CALCULATE ( MIN ( dim_date[date_key] ), ALLSELECTED ( dim_date ) )
+				formatString: d mmm yyyy
+				displayFolder: Period comparison\Helpers
+				lineageTag: 92ae01cc-0d28-43b2-beb4-92b4e8615bef
+
+			/// Last day of the range selected in the date slicer.
+			measure 'Period End' = CALCULATE ( MAX ( dim_date[date_key] ), ALLSELECTED ( dim_date ) )
+				formatString: d mmm yyyy
+				displayFolder: Period comparison\Helpers
+				lineageTag: fe74defa-7528-4d03-bae7-c62aa8aa59b2
+
+			measure 'Period Days' = DATEDIFF ( [Period Start], [Period End], DAY ) + 1
+				formatString: 0
+				displayFolder: Period comparison\Helpers
+				lineageTag: 8509434a-e47c-4469-a372-f4adb1a6d3d6
+
+			/// Previous period = the same number of days immediately before the selected range.
+			measure 'Comparison Start' = [Period Start] - [Period Days]
+				formatString: d mmm yyyy
+				displayFolder: Period comparison\Helpers
+				lineageTag: 71b38b9f-f0d1-46ce-9d59-811bd778cb69
+
+			measure 'Comparison End' = [Period Start] - 1
+				formatString: d mmm yyyy
+				displayFolder: Period comparison\Helpers
+				lineageTag: 72513ba5-c04a-4713-ab14-7bf84f0e385e
+
+			measure 'Comparison Caption' = "vs. previous period"
+				displayFolder: Period comparison\Helpers
+				lineageTag: ecf24aa9-7094-496e-9071-0dbb0b3a3da3
+
+			measure 'Period Range Label' = FORMAT ( [Period Start], "d mmm yyyy" ) & " – " & FORMAT ( [Period End], "d mmm yyyy" )
+				displayFolder: Period comparison\Helpers
+				lineageTag: 2cf78dff-60fb-4655-ae9b-0e503313fcaf
+
+			measure 'Comparison Range Label' = FORMAT ( [Comparison Start], "d mmm yyyy" ) & " – " & FORMAT ( [Comparison End], "d mmm yyyy" )
+				displayFolder: Period comparison\Helpers
+				lineageTag: 29ad17ee-9593-4e4b-b7be-694c31c03e53
+
+			/// Previous period = same number of days immediately before the slicer range. Blank if that window starts before the first day of data.
+			measure 'Total users (Comparison)' =
+					VAR _start = [Comparison Start]
+					VAR _end   = [Comparison End]
+					RETURN
+					    IF (
+					        _start >= [First Data Date],
+					        CALCULATE (
+					            [Total users],
+					            REMOVEFILTERS ( dim_date ),
+					            DATESBETWEEN ( dim_date[date_key], _start, _end )
+					        )
+					    )
+				formatString: #,0
+				displayFolder: Period comparison\Previous period
+				lineageTag: b4b6ae36-fe16-437c-a6cc-140a7b034f2a
+
+			measure 'New users (Comparison)' =
+					VAR _start = [Comparison Start]
+					VAR _end   = [Comparison End]
+					RETURN
+					    IF (
+					        _start >= [First Data Date],
+					        CALCULATE (
+					            [New users],
+					            REMOVEFILTERS ( dim_date ),
+					            DATESBETWEEN ( dim_date[date_key], _start, _end )
+					        )
+					    )
+				formatString: #,0
+				displayFolder: Period comparison\Previous period
+				lineageTag: e2f79d4b-f037-496d-8a00-cf888e134d41
+
+			measure 'Ecommerce purchases (Comparison)' =
+					VAR _start = [Comparison Start]
+					VAR _end   = [Comparison End]
+					RETURN
+					    IF (
+					        _start >= [First Data Date],
+					        CALCULATE (
+					            [Ecommerce purchases],
+					            REMOVEFILTERS ( dim_date ),
+					            DATESBETWEEN ( dim_date[date_key], _start, _end )
+					        )
+					    )
+				formatString: #,0
+				displayFolder: Period comparison\Previous period
+				lineageTag: a9f90c4c-cb7d-45be-a1a9-51dfcc00b2f8
+
+			measure 'ECVR (Comparison)' =
+					VAR _start = [Comparison Start]
+					VAR _end   = [Comparison End]
+					RETURN
+					    IF (
+					        _start >= [First Data Date],
+					        CALCULATE (
+					            [ECVR],
+					            REMOVEFILTERS ( dim_date ),
+					            DATESBETWEEN ( dim_date[date_key], _start, _end )
+					        )
+					    )
+				formatString: 0.00%
+				displayFolder: Period comparison\Previous period
+				lineageTag: 1289815c-90e0-4e50-bb26-dbbcf317cfec
+
+			measure 'Purchase revenue (Comparison)' =
+					VAR _start = [Comparison Start]
+					VAR _end   = [Comparison End]
+					RETURN
+					    IF (
+					        _start >= [First Data Date],
+					        CALCULATE (
+					            [Purchase revenue],
+					            REMOVEFILTERS ( dim_date ),
+					            DATESBETWEEN ( dim_date[date_key], _start, _end )
+					        )
+					    )
+				formatString: \$#,0.00
+				displayFolder: Period comparison\Previous period
+				lineageTag: 9002b35b-116b-4397-9b85-54be4d919d72
+
+			measure 'Total users Change %' = DIVIDE ( [Total users] - [Total users (Comparison)], [Total users (Comparison)] )
+				formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+				displayFolder: Period comparison\Change %
+				lineageTag: 65558fe6-1e04-4c3d-9056-9cea2c4af982
+
+			measure 'New users Change %' = DIVIDE ( [New users] - [New users (Comparison)], [New users (Comparison)] )
+				formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+				displayFolder: Period comparison\Change %
+				lineageTag: 8bd5d505-a833-4b68-890e-75465c848adf
+
+			measure 'Ecommerce purchases Change %' = DIVIDE ( [Ecommerce purchases] - [Ecommerce purchases (Comparison)], [Ecommerce purchases (Comparison)] )
+				formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+				displayFolder: Period comparison\Change %
+				lineageTag: 0753d30b-7d3f-4ec9-823c-c6147be28005
+
+			measure 'ECVR Change %' = DIVIDE ( [ECVR] - [ECVR (Comparison)], [ECVR (Comparison)] )
+				formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+				displayFolder: Period comparison\Change %
+				lineageTag: 7dc2cd94-de68-4b6f-960f-44e08b7d213d
+
+			measure 'Purchase revenue Change %' = DIVIDE ( [Purchase revenue] - [Purchase revenue (Comparison)], [Purchase revenue (Comparison)] )
+				formatString: \▲ 0.0%;\▼ 0.0%;0.0%
+				displayFolder: Period comparison\Change %
+				lineageTag: 9baa0655-2c45-40de-a4db-ddb65e12c919
+
+			measure 'KPI Card SVG Selected' =
+					
+					VAR _KPIOrder =
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] )
+					
+					-- Configuration
+					VAR _W = 180
+					VAR _H = 100
+					
+					-- Calculations
+					VAR _KPIName =
+					    SWITCH (
+					        _KPIOrder,
+					        0, "Total users",
+					        1, "New users",
+					        2, "Ecommerce purchases",
+					        3, "ECVR",
+					        4, "Purchase revenue",
+					        "KPI"
+					    )
+					
+					VAR _KPIValue = [KPI Value]
+					VAR _KPIDelta = [KPI Delta]
+					
+					VAR _FormattedValue =
+					    SWITCH (
+					        _KPIOrder,
+					        0, FORMAT ( _KPIValue, "#,##0" ),
+					        1, FORMAT ( _KPIValue, "#,##0" ),
+					        2, FORMAT ( _KPIValue, "#,##0" ),
+					        3, FORMAT ( _KPIValue, "0.00%" ),
+					        4, FORMAT ( _KPIValue, "$#,##0,.0K" ),
+					        FORMAT ( _KPIValue, "#,##0.##" )
+					    )
+					
+					VAR _FormattedValueEncoded =
+					    SUBSTITUTE (
+					        SUBSTITUTE ( _FormattedValue, "%", "%25" ),
+					        "+", "%2B"
+					    )
+					
+					VAR _FormattedDelta =
+					    FORMAT ( _KPIDelta, "+0.0%;-0.0%;0.0%" )
+					
+					VAR _DeltaRaw =
+					    IF (
+					        ISBLANK ( _KPIDelta ),
+					        "N/A",
+					        _FormattedDelta
+					    )
+					
+					VAR _DeltaTextEncoded =
+					    SUBSTITUTE (
+					        SUBSTITUTE (
+					            SUBSTITUTE ( _DeltaRaw, "%", "%25" ),
+					            "+", "%2B"
+					        ),
+					        " ", "%20"
+					    )
+					
+					-- Colors
+					VAR _LabelColor = "%230057CE" -- Selected blue
+					VAR _ValueColor = "%23041225" -- Dark navy
+					VAR _AccentBlue = "%230057CE" -- Selection underline
+					VAR _CardBackground = "%23FFFFFF" -- White
+					
+					VAR _DeltaColor =
+					    SWITCH (
+					        TRUE (),
+					        ISBLANK ( _KPIDelta ), "%2364778F",
+					        _KPIDelta > 0, "%230057CE",
+					        _KPIDelta < 0, "%23D51A9F",
+					        "%2364778F"
+					    )
+					
+					VAR _DeltaFill =
+					    SWITCH (
+					        TRUE (),
+					        ISBLANK ( _KPIDelta ), "%23F3F6FA",
+					        _KPIDelta > 0, "%23EAF2FF",
+					        _KPIDelta < 0, "%23FCEAF5",
+					        "%23F3F6FA"
+					    )
+					
+					VAR _DeltaArrow =
+					    SWITCH (
+					        TRUE (),
+					        ISBLANK ( _KPIDelta ), "",
+					        _KPIDelta > 0, "&%239650;",
+					        _KPIDelta < 0, "&%239660;",
+					        ""
+					    )
+					
+					VAR _DeltaDisplay =
+					    IF (
+					        ISBLANK ( _KPIDelta ),
+					        "N/A",
+					        IF (
+					            _DeltaArrow <> "",
+					            _DeltaArrow & "%20" & _DeltaTextEncoded,
+					            _DeltaTextEncoded
+					        )
+					    )
+					
+					-- Geometry: adapt typography and positioning to the value
+					VAR _ValueFontSize =
+					    SWITCH (
+					        TRUE (),
+					        LEN ( _FormattedValue ) >= 13, 13,
+					        LEN ( _FormattedValue ) >= 10, 18,
+					        LEN ( _FormattedValue ) >= 8, 20,
+					        24
+					    )
+					
+					VAR _EstimatedValueWidth =
+					    LEN ( _FormattedValue ) * _ValueFontSize * 0.64
+					
+					VAR _DeltaX =
+					    12 + _EstimatedValueWidth + 4
+					
+					VAR _DeltaXText =
+					    FORMAT ( _DeltaX, "0" )
+					
+					VAR _DeltaCenterX =
+					    FORMAT ( _DeltaX + 34, "0" )
+					
+					-- SVG
+					VAR _SVG =
+					    "<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='-2 -2 184 104' overflow='visible' display='block'>"
+					        & "<rect x='1' y='1' width='178' height='98' rx='7' fill='" & _CardBackground & "'/>"
+					        & "<text x='12' y='26' font-family='Segoe UI,Arial,sans-serif' font-size='14' font-weight='600' fill='" & _LabelColor & "'>"
+					        & _KPIName
+					        & "</text>"
+					        & "<text x='12' y='63' font-family='Segoe UI,Arial,sans-serif' font-size='" & FORMAT ( _ValueFontSize, "0" ) & "' font-weight='700' fill='" & _ValueColor & "'>"
+					        & _FormattedValueEncoded
+					        & "</text>"
+					        & "<rect x='" & _DeltaXText & "' y='43' width='68' height='22' rx='5' fill='" & _DeltaFill & "'/>"
+					        & "<text x='" & _DeltaCenterX & "' y='58' text-anchor='middle' font-family='Segoe UI,Arial,sans-serif' font-size='11' font-weight='600' fill='" & _DeltaColor & "'>"
+					        & _DeltaDisplay
+					        & "</text>"
+					        & "<rect x='58' y='78' width='64' height='3' rx='1.5' fill='" & _AccentBlue & "'/>"
+					        & "</svg>"
+					
+					RETURN
+					    IF (
+					        HASONEVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					        "data:image/svg+xml;charset=utf-8," & _SVG,
+					        BLANK ()
+					    )
+				lineageTag: 783d68be-2a47-4298-8011-21b750c1b32e
+				dataCategory: ImageUrl
+
+			measure 'KPI Comparison' =
+					SWITCH (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					    0, [Total users (Comparison)],
+					    1, [New users (Comparison)],
+					    2, [Ecommerce purchases (Comparison)],
+					    3, [ECVR (Comparison)],
+					    4, [Purchase revenue (Comparison)]
+					)
+				displayFolder: Period comparison\Selected KPI table
+				lineageTag: 558e9455-a387-4f5c-bd26-b4bdd05546b8
+
+				formatStringDefinition =
+						SWITCH (
+						    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+						    3, "0.00%",
+						    4, "\$#,0",
+						    "#,0"
+						)
+
+			measure 'KPI Share of Total' =
+					IF (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ) = 3,
+					    BLANK (),    -- a rate (ECVR) has no meaningful share of total
+					    DIVIDE (
+					        [KPI Value],
+					        CALCULATE ( [KPI Value], ALLSELECTED ( dim_traffic_source ) )
+					    )
+					)
+				formatString: 0.0%
+				displayFolder: Period comparison\Selected KPI table
+				lineageTag: c44d6e94-ec22-429b-8f99-36de70beb261
+
+			measure 'KPI Target Bar' =
+					-- Same logic as UDF_TargetLineBarChart, inlined as a regular measure.
+					-- Bar = selected KPI for the selected period; dashed line = comparison period.
+					
+					-- Colors (# encoded as %23 so the data URI stays valid)
+					VAR _AboveColor  = "%230057CE"   -- primary:   at/above comparison
+					VAR _BelowColor  = "%23D51A9F"   -- secondary: below comparison
+					VAR _TrackColor  = "%23E6EDF8"   -- light tint of primary
+					VAR _TargetColor = "%23041225"   -- main text color
+					
+					-- Geometry
+					VAR _ChartHeight = 35
+					VAR _BarHeight   = 28
+					VAR _AxisMin     = 0
+					VAR _AxisMax     = 130
+					
+					-- Values
+					VAR _Actual      = [KPI Value]
+					VAR _Target      = [KPI Comparison]
+					VAR _HasTarget   = NOT ISBLANK ( _Target )
+					VAR _Performance = DIVIDE ( _Actual - _Target, _Target )
+					VAR _Range       = _AxisMax - _AxisMin
+					
+					-- Common scale across all traffic sources shown
+					VAR _MaxActual =
+					    CALCULATE (
+					        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Value] ),
+					        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+					    )
+					VAR _MaxTarget =
+					    CALCULATE (
+					        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Comparison] ),
+					        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+					    )
+					VAR _GlobalMax = MAX ( _MaxActual, _MaxTarget ) * 1.15
+					
+					VAR _ActualWidth = MAX ( 0, DIVIDE ( _Actual, _GlobalMax ) * _Range )
+					VAR _TargetPos   = _AxisMin + DIVIDE ( _Target, _GlobalMax ) * _Range
+					VAR _BarColor    = IF ( _HasTarget && _Performance < 0, _BelowColor, _AboveColor )
+					VAR _BarY        = ( _ChartHeight - _BarHeight ) / 2
+					
+					VAR _SVG =
+					    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 "
+					        & _AxisMax & " " & _ChartHeight & "' preserveAspectRatio='none'>"
+					    & "<rect x='" & _AxisMin & "' y='" & _BarY & "' width='" & _Range & "' height='" & _BarHeight
+					        & "' fill='" & _TrackColor & "' rx='4' ry='4'/>"
+					    & "<rect x='" & _AxisMin & "' y='" & _BarY & "' width='" & _ActualWidth & "' height='" & _BarHeight
+					        & "' fill='" & _BarColor & "' rx='4' ry='4'/>"
+					    & IF (
+					        _HasTarget,
+					        "<line x1='" & _TargetPos & "' y1='0' x2='" & _TargetPos & "' y2='" & _ChartHeight
+					            & "' stroke='" & _TargetColor & "' stroke-width='2' stroke-dasharray='4 2'/>",
+					        ""
+					    )
+					    & "</svg>"
+					
+					RETURN
+					    IF (
+					        HASONEVALUE ( dim_traffic_source[traffic_source] ) && NOT ISBLANK ( _Actual ),
+					        _SVG
+					    )
+				displayFolder: Period comparison\Selected KPI table
+				lineageTag: b02f9b23-c0ca-4d7c-a223-f8f1c2ec60d4
+				dataCategory: ImageUrl
+
+			measure 'KPI Table Title' =
+					"Acquisition by traffic source – " & SWITCH (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					    0, "Total users",
+					    1, "New users",
+					    2, "Ecommerce purchases",
+					    3, "ECVR",
+					    4, "Purchase revenue",
+					    "KPIs"
+					)
+				displayFolder: Period comparison\Selected KPI table
+				lineageTag: 10a9bc79-44a7-4ede-918e-3a004b479a07
+
+			measure 'KPI Table Subtitle' = [Period Range Label] & "  " & [Comparison Caption] & "  (" & [Comparison Range Label] & ")"
+				displayFolder: Period comparison\Selected KPI table
+				lineageTag: 75152273-45a2-4c77-9b49-02d50c10c1a6
+
+			/// Value for the selected KPI in the configured comparison period.
+			measure 'KPI Comparison Value' =
+					SWITCH (
+					    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+					    0, [Total users (Comparison)],
+					    1, [New users (Comparison)],
+					    2, [Ecommerce purchases (Comparison)],
+					    3, [ECVR (Comparison)],
+					    4, [Purchase revenue (Comparison)]
+					)
+				displayFolder: User Acquisition\KPI Selector
+				lineageTag: e15cdd6a-f775-4436-8e05-28f60ac9b59d
+
+				formatStringDefinition =
+						SWITCH (
+						    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+						    3, "0.00%",
+						    4, "\$#,0",
+						    "#,0"
+						)
+
+			/// SVG bar: selected-period KPI in blue with comparison-period target marker in magenta.
+			measure 'KPI Target Line Bar SVG' =
+					VAR _Actual = [KPI Value]
+					VAR _Target = [KPI Comparison Value]
+					VAR _MaxActual =
+					    CALCULATE (
+					        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Value] ),
+					        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+					    )
+					VAR _MaxTarget =
+					    CALCULATE (
+					        MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [KPI Comparison Value] ),
+					        REMOVEFILTERS ( dim_traffic_source[traffic_source] )
+					    )
+					VAR _ScaleMax = MAX ( _MaxActual, _MaxTarget )
+					VAR _ChartWidth = 180
+					VAR _ChartHeight = 34
+					VAR _BarWidth = MAX ( 0, DIVIDE ( _Actual, _ScaleMax, 0 ) * _ChartWidth )
+					VAR _TargetX = MIN ( _ChartWidth, MAX ( 0, DIVIDE ( _Target, _ScaleMax, 0 ) * _ChartWidth ) )
+					VAR _TargetLine =
+					    IF (
+					        NOT ISBLANK ( _Target ),
+					        "<line x1='" & FORMAT ( _TargetX, "0.0" ) & "' y1='3' x2='" & FORMAT ( _TargetX, "0.0" ) & "' y2='31' stroke='%23D51A9F' stroke-width='3'/>",
+					        ""
+					    )
+					VAR _Svg =
+					    "<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 180 34' preserveAspectRatio='none'>"
+					        & "<rect x='0' y='7' width='180' height='20' rx='3' fill='%23041225' fill-opacity='0.08'/>"
+					        & "<rect x='0' y='7' width='" & FORMAT ( _BarWidth, "0.0" ) & "' height='20' rx='3' fill='%230057CE'/>"
+					        & _TargetLine
+					        & "</svg>"
+					RETURN
+					    IF ( NOT ISBLANK ( _Actual ), "data:image/svg+xml;utf8," & _Svg )
+				formatString: @
+				displayFolder: User Acquisition\KPI Selector
+				lineageTag: 3ef7d35f-d496-44b9-9616-ea6eb5e7c2c9
+				dataCategory: ImageUrl
+
+			/// First day with data in the model (ignores all filters).
+			measure 'First Data Date' = CALCULATE ( MIN ( fact_events[date_key] ), REMOVEFILTERS () )
+				formatString: d mmm yyyy
+				displayFolder: Period comparison\Helpers
+				lineageTag: 75b1208c-ac14-4804-b36b-aeaf40604ec7
+
+			partition #_Measures_ = m
+				mode: import
+				source =
+						let
+						  Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+						    #"Removed Columns" = Table.RemoveColumns(Source,{"Column1"})
+						in
+						  #"Removed Columns"
+
+			annotation PBI_NavigationStepName = Navigation
+
+			annotation PBI_ResultType = Table
+
+		table 'KPI Selector'
+			lineageTag: 19306c11-d48e-4c3b-808b-655cb48549cb
+
+			column 'KPI Selector Order'
+				dataType: int64
+				isHidden
+				formatString: 0
+				lineageTag: f36b125e-f139-4d7e-bbf3-8b2709a3faa1
+				summarizeBy: sum
+				sourceColumn: [Value3]
+
+			column 'KPI Selector Fields'
+				dataType: string
+				isHidden
+				lineageTag: 0e231ad2-1739-4342-a96a-65dd4ea917cf
+				summarizeBy: none
+				sourceColumn: [Value2]
+				sortByColumn: 'KPI Selector Order'
+
+				extendedProperty ParameterMetadata =
+						{
+						  "version": 3,
+						  "kind": 2
+						}
+
+			column 'KPI Selector'
+				dataType: string
+				lineageTag: 83e078bf-68a2-4308-b28b-1b429b10b3f5
+				summarizeBy: none
+				sourceColumn: [Value1]
+				sortByColumn: 'KPI Selector Order'
+
+				relatedColumnDetails
+					groupByColumn: 'KPI Selector Fields'
+
+			partition 'KPI Selector' = calculated
+				mode: import
+				source =
+						{
+						    ("Total users", NAMEOF('#_Measures_'[Total users]), 0),
+						    ("New users", NAMEOF('#_Measures_'[New users]), 1),
+						    ("Ecommerce purchases", NAMEOF('#_Measures_'[Ecommerce purchases]), 2),
+						    ("ECVR", NAMEOF('#_Measures_'[ECVR]), 3),
+						    ("Purchase revenue", NAMEOF('#_Measures_'[Purchase revenue]), 4)
+						}
+
+		relationship AutoDetected_5df1b329-4cf1-46e0-a912-9fe09fbc06da
+			fromColumn: fact_sessions.user_key
+			toColumn: dim_user.user_key
+
+		relationship AutoDetected_48b3d952-aab3-45e0-85d9-3bba8983a9ad
+			fromColumn: fact_events.user_key
+			toColumn: dim_user.user_key
+
+		relationship AutoDetected_927aec37-6a9e-44c9-a523-18e68221237d
+			fromColumn: fact_sessions.traffic_source_key
+			toColumn: dim_traffic_source.traffic_source_key
+
+		relationship AutoDetected_a14cb502-0fb3-40db-a536-ee29a64c1692
+			fromColumn: fact_events.traffic_source_key
+			toColumn: dim_traffic_source.traffic_source_key
+
+		relationship fact_events_date_key_dim_date_date_key
+			fromColumn: fact_events.date_key
+			toColumn: dim_date.date_key
+
+		relationship fact_sessions_date_key_dim_date_date_key
+			fromColumn: fact_sessions.date_key
+			toColumn: dim_date.date_key
+
+		cultureInfo en-US
+
+			linguisticMetadata = {"Version":"2.0.0","Language":"en-US","Entities":{"table_measures_.total_users":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"Total users"}},"State":"Generated","Terms":[{"Total users":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.new_users":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"New users"}},"State":"Generated","Terms":[{"New users":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.ecommerce_purchases":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"Ecommerce purchases"}},"State":"Generated","Terms":[{"Ecommerce purchases":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.ecvr":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"ECVR"}},"State":"Generated","Terms":[{"ECVR":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.purchase_revenue":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"Purchase revenue"}},"State":"Generated","Terms":[{"Purchase revenue":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.total_users_yoy_":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"Total users YoY %"}},"State":"Generated","Terms":[{"% Δ":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.of_users":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"% of Users"}},"State":"Generated","Terms":[{"% of Users":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.new_users_yoy_":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"New users YoY %"}},"State":"Generated","Terms":[{"% Δ":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.new_users1":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"% New Users"}},"State":"Generated","Terms":[{"% New Users":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.ecommerce_purchases_yoy_":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"Ecommerce purchases YoY %"}},"State":"Generated","Terms":[{"% Δ":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.ecvr_yoy_":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"ECVR YoY %"}},"State":"Generated","Terms":[{"% Δ":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.purchase_revenue_yoy_":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"Purchase revenue YoY %"}},"State":"Generated","Terms":[{"% Δ":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.revenue":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"% Revenue"}},"State":"Generated","Terms":[{"% Revenue":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.revenue_yoy_":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"% Revenue YoY %"}},"State":"Generated","Terms":[{"% Δ":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"dim_traffic_source.traffic_source":{"Definition":{"Binding":{"ConceptualEntity":"dim_traffic_source","ConceptualProperty":"traffic_source"}},"State":"Generated","Terms":[{"Traffic source":{"State":"Suggested","Source":{"Type":"External","Agent":"PowerBI.VisualColumnRename"},"Weight":0.9}}]},"table_measures_.kpi_value":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"KPI Value"}},"State":"Generated"},"table_measures_.kpi_delta":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"KPI Delta"}},"State":"Generated"},"table_measures_.kpi_target_line_bar_svg":{"Definition":{"Binding":{"ConceptualEntity":"#_Measures_","ConceptualProperty":"KPI Target Line Bar SVG"}},"State":"Generated"}}}
+				contentType: json
+
+		annotation __PBI_TimeIntelligenceEnabled = 0
+
+		annotation PBI_QueryOrder = ["fact_event_items","fact_sessions","fact_events","dim_user","dim_traffic_source","dim_item","dim_geo","dim_device","dim_date","dim_app_info","#_Measures_"]
+
+		annotation PBI_ProTooling = ["TMDLView_Desktop","DevMode","MCP-PBIModeling"]
 

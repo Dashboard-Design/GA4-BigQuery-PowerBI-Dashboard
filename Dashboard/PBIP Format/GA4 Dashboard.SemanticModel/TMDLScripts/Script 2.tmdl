@@ -1,0 +1,245 @@
+createOrReplace
+
+	ref table '#_Measures_'
+
+		/// TRUE when the previous period lies fully inside the loaded data, so comparison visuals can be trusted.
+		measure 'KPI Comparison Available' = [Comparison Start] >= [First Data Date]
+			displayFolder: IBCS table
+
+		/// Number format of the selected KPI, used to format SVG labels.
+		measure 'KPI Format String' = ```
+				SWITCH (
+				    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				    3, "0.00%",
+				    4, "$#,0",
+				    "#,0"
+				)
+				```
+			displayFolder: IBCS table
+
+		/// Formatted current value of the selected KPI, safe to embed in an SVG data URI (% encoded).
+		measure 'KPI Label Current' = SUBSTITUTE ( FORMAT ( [KPI Value], [KPI Format String] ), "%", "%25" )
+			displayFolder: IBCS table
+
+		/// Absolute change vs the previous period, formatted per KPI (ECVR in percentage points).
+		measure 'KPI Label Delta' = ```
+				VAR _delta = [KPI Value] - COALESCE ( [KPI Comparison], 0 )
+				RETURN
+				    SWITCH (
+				        SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				        3, FORMAT ( _delta * 100, "+0.00;-0.00;0.00" ) & " pp",
+				        4, FORMAT ( _delta, "+$#,0;-$#,0;$0" ),
+				        FORMAT ( _delta, "+#,0;-#,0;0" )
+				    )
+				```
+			displayFolder: IBCS table
+
+		/// IBCS bar: selected KPI, current period (blue) over previous period (grey). Set data category to Image URL.
+		measure 'KPI IBCS Bar' = ```
+				-- IBCS bar: selected KPI for the selected period (blue bar) over the previous period (grey bar).
+				-- Adapted from PowerofBI.IBCS.BarChart.AbsoluteValues (MIT licence, Andrzej Leszkiewicz).
+				-- Set the table column's Cell elements > Image width / height to _W x _H below.
+
+				-- Layout
+				VAR _W = 240
+				VAR _H = 30
+				VAR _Em = _H * 0.6
+				VAR _LabelPad = _Em * 0.3
+
+				-- Colors (# encoded as %23 so the data URI stays valid)
+				VAR _ColorCurrent  = "%230057CE"   -- primary
+				VAR _ColorPrevious = "%23B9C4D6"   -- muted slate tint
+				VAR _ColorText     = "%23041225"   -- main text
+				VAR _ColorAxis     = "%2364778F"   -- muted slate
+
+				-- Values
+				VAR _Actual  = [KPI Value]
+				VAR _HasBase = [KPI Comparison Available]
+				VAR _Base    = IF ( _HasBase, COALESCE ( [KPI Comparison], 0 ) )
+				VAR _IsRow   = ISINSCOPE ( dim_traffic_source[traffic_source] )
+				VAR _ValueMax =
+				    MAXX (
+				        ALLSELECTED ( dim_traffic_source[traffic_source] ),
+				        MAX ( [KPI Value], [KPI Comparison] )
+				    )
+				VAR _Scale     = DIVIDE ( _W * 0.76, _ValueMax )
+				VAR _WidthCur  = ROUND ( _Actual * _Scale, 0 )
+				VAR _WidthPrev = ROUND ( _Base * _Scale, 0 )
+				VAR _LabelX    = MAX ( _WidthCur, _WidthPrev ) + _LabelPad
+				VAR _Label     = [KPI Label Current]
+				-- Sort key embedded in the SVG so the column can be sorted
+				VAR _Rank = 1000000000000 + ROUND ( DIVIDE ( _Actual, _ValueMax ) * 1000000, 0 )
+
+				-- SVG
+				VAR _Open =
+				    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='" & _W & "' height='" & _H & "'>"
+				VAR _Style =
+				    "<style>text{font-family:'Segoe UI',sans-serif;font-size:" & _Em & "px;dominant-baseline:central;}</style>"
+				VAR _Previous =
+				    IF (
+				        _HasBase,
+				        "<rect x='0' y='0.5' width='" & _WidthPrev & "' height='" & _Em & "' fill='" & _ColorPrevious & "'/>",
+				        ""
+				    )
+				VAR _Current =
+				    "<rect x='0' y='" & ( _H - _Em ) / 2 & "' width='" & _WidthCur & "' height='" & _Em & "' fill='" & _ColorCurrent & "'/>"
+				VAR _Axis =
+				    "<line x1='0.5' x2='0.5' y1='0' y2='" & _H & "' stroke='" & _ColorAxis & "' stroke-width='1'/>"
+				VAR _Text =
+				    "<text x='" & _LabelX & "' y='" & _H / 2 & "' fill='" & _ColorText & "'>" & _Label & "</text>"
+				VAR _TextTotal =
+				    "<text x='2' y='" & _H / 2 & "' fill='" & _ColorText & "' font-weight='bold'>" & _Label & "</text>"
+				VAR _SvgRow   = _Open & _Style & "/*SortBy:" & _Rank & "*/" & _Previous & _Current & _Axis & _Text & "</svg>"
+				VAR _SvgTotal = _Open & _Style & _TextTotal & "</svg>"
+
+				RETURN
+				    IF ( ISBLANK ( _Actual ), BLANK (), IF ( _IsRow, _SvgRow, _SvgTotal ) )
+				```
+			displayFolder: IBCS table
+			dataCategory: ImageUrl
+
+		/// IBCS variance bar: absolute change vs the previous period, diverging from a centre axis.
+		measure 'KPI IBCS Variance' = ```
+				-- IBCS variance bar: absolute change vs the previous period, diverging from a centre axis.
+				-- Blue = increase, magenta = decrease (your palette; all five KPIs are "higher is better").
+				-- Adapted from PowerofBI.IBCS.BarChart.AbsoluteVariance (MIT licence, Andrzej Leszkiewicz).
+				-- Scaled to the largest change in the table so small changes stay readable.
+
+				-- Layout
+				VAR _W = 240
+				VAR _H = 30
+				VAR _Em = _H * 0.6
+				VAR _LabelPad = _Em * 0.3
+
+				-- Colors (# encoded as %23 so the data URI stays valid)
+				VAR _ColorUp   = "%230057CE"   -- primary
+				VAR _ColorDown = "%23D51A9F"   -- secondary
+				VAR _ColorText = "%23041225"   -- main text
+				VAR _ColorAxis = "%2364778F"   -- muted slate
+
+				-- Values
+				VAR _Available = [KPI Comparison Available]
+				VAR _Actual    = [KPI Value]
+				VAR _Var       = _Actual - COALESCE ( [KPI Comparison], 0 )
+				VAR _IsRow     = ISINSCOPE ( dim_traffic_source[traffic_source] )
+				VAR _MaxAbs =
+				    MAXX (
+				        ALLSELECTED ( dim_traffic_source[traffic_source] ),
+				        ABS ( [KPI Value] - COALESCE ( [KPI Comparison], 0 ) )
+				    )
+				VAR _AxisX  = _W / 2
+				VAR _Scale  = DIVIDE ( _W * 0.36, _MaxAbs )
+				VAR _Width  = ROUND ( ABS ( _Var ) * _Scale, 0 )
+				VAR _Up     = _Var >= 0
+				VAR _X      = IF ( _Up, _AxisX, _AxisX - _Width )
+				VAR _Color  = IF ( _Up, _ColorUp, _ColorDown )
+				VAR _Anchor = IF ( _Up, "start", "end" )
+				VAR _LabelX = IF ( _Up, _AxisX + _Width + _LabelPad, _AxisX - _Width - _LabelPad )
+				VAR _Label  = [KPI Label Delta]
+				VAR _Rank   = 1000000000000 + ROUND ( DIVIDE ( _Var + _MaxAbs, 2 * _MaxAbs ) * 1000000, 0 )
+
+				-- SVG
+				VAR _Open =
+				    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='" & _W & "' height='" & _H & "'>"
+				VAR _Style =
+				    "<style>text{font-family:'Segoe UI',sans-serif;font-size:" & _Em & "px;dominant-baseline:central;}</style>"
+				VAR _AxisLine =
+				    "<line x1='" & _AxisX & "' x2='" & _AxisX & "' y1='0' y2='" & _H & "' stroke='" & _ColorAxis & "' stroke-width='1'/>"
+				VAR _Bar =
+				    "<rect x='" & _X & "' y='" & ( _H - _Em ) / 2 & "' width='" & _Width & "' height='" & _Em & "' fill='" & _Color & "'/>"
+				VAR _Text =
+				    "<text x='" & _LabelX & "' y='" & _H / 2 & "' fill='" & _ColorText & "' text-anchor='" & _Anchor & "'>" & _Label & "</text>"
+				VAR _TextTotal =
+				    "<text x='" & _AxisX & "' y='" & _H / 2 & "' fill='" & _ColorText & "' text-anchor='middle' font-weight='bold'>" & _Label & "</text>"
+				VAR _SvgRow   = _Open & _Style & "/*SortBy:" & _Rank & "*/" & _AxisLine & _Bar & _Text & "</svg>"
+				VAR _SvgTotal = _Open & _Style & _TextTotal & "</svg>"
+
+				RETURN
+				    IF (
+				        NOT _Available || ISBLANK ( _Actual ),
+				        BLANK (),
+				        IF ( _IsRow, _SvgRow, _SvgTotal )
+				    )
+				```
+			displayFolder: IBCS table
+			dataCategory: ImageUrl
+
+		/// IBCS pin chart: relative change (%) vs the previous period, capped at +/-100%.
+		measure 'KPI IBCS Pin' = ```
+				-- IBCS pin chart: relative change (%) vs the previous period. Pins are capped at +/-100%;
+				-- larger changes show a triangle, and a source with no previous value shows "NEW".
+				-- Adapted from PowerofBI.IBCS.BarChart.RelativeVariance (MIT licence, Andrzej Leszkiewicz).
+
+				-- Layout
+				VAR _W = 240
+				VAR _H = 30
+				VAR _Em = _H * 0.6
+				VAR _LabelPad = _Em * 0.3
+				VAR _HeadW = _Em * 0.5
+				VAR _HeadH = _Em * 0.9
+
+				-- Colors (# encoded as %23 so the data URI stays valid)
+				VAR _ColorUp   = "%230057CE"   -- primary
+				VAR _ColorDown = "%23D51A9F"   -- secondary
+				VAR _ColorText = "%23041225"   -- main text
+				VAR _ColorAxis = "%23C9D3E3"   -- light slate
+
+				-- Values
+				VAR _Available = [KPI Comparison Available]
+				VAR _Actual    = [KPI Value]
+				VAR _Base      = COALESCE ( [KPI Comparison], 0 )
+				VAR _IsRow     = ISINSCOPE ( dim_traffic_source[traffic_source] )
+				VAR _IsNew     = _Actual > 0 && _Base = 0
+				VAR _NoData    = NOT _Available || ISBLANK ( _Actual ) || ( _Actual = 0 && _Base = 0 )
+				VAR _Pct       = IF ( _Base = 0, BLANK (), ROUND ( DIVIDE ( _Actual - _Base, _Base ) * 100, 0 ) )
+				VAR _PctCapped = SIGN ( _Pct ) * MIN ( 100, ABS ( _Pct ) )
+				VAR _IsOutlier = ABS ( _Pct ) > 100
+				VAR _AxisX     = _W / 2
+				VAR _Width     = ROUND ( ABS ( _PctCapped ) / 100 * _W * 0.30, 0 )
+				VAR _Up        = _Pct >= 0
+				VAR _Tip       = IF ( _Up, _AxisX + _Width, _AxisX - _Width )
+				VAR _X         = IF ( _Up, _AxisX, _AxisX - _Width )
+				VAR _Color     = IF ( _Up, _ColorUp, _ColorDown )
+				VAR _Span      = IF ( _IsOutlier, _Em * 0.9, _HeadW / 2 )
+				VAR _Label     = IF ( _IsNew, "NEW", FORMAT ( _Pct, "+0;-0;0" ) & "%25" )
+				VAR _LabelX    = IF ( _IsNew, _AxisX + _LabelPad, IF ( _Up, _Tip + _Span + _LabelPad, _Tip - _Span - _LabelPad ) )
+				VAR _Anchor    = IF ( _IsNew || _Up, "start", "end" )
+				VAR _Rank      = 1000000000000 + ROUND ( MAX ( -1000, MIN ( 1000, COALESCE ( _Pct, 1000 ) ) ) + 1000, 0 )
+
+				-- SVG
+				VAR _Open =
+				    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='" & _W & "' height='" & _H & "'>"
+				VAR _Style =
+				    "<style>text{font-family:'Segoe UI',sans-serif;font-size:" & _Em & "px;dominant-baseline:central;}</style>"
+				VAR _AxisLine =
+				    "<line x1='" & _AxisX & "' x2='" & _AxisX & "' y1='0' y2='" & _H & "' stroke='" & _ColorAxis & "' stroke-width='2'/>"
+				VAR _PinBar =
+				    IF (
+				        _IsNew || ISBLANK ( _Pct ),
+				        "",
+				        "<rect x='" & _X & "' y='" & _H / 2 - _Em * 0.12 & "' width='" & _Width & "' height='" & _Em * 0.24 & "' fill='" & _Color & "'/>"
+				    )
+				VAR _PinHead =
+				    IF (
+				        _IsNew || ISBLANK ( _Pct ),
+				        "",
+				        IF (
+				            _IsOutlier,
+				            "<text x='" & _Tip & "' y='" & _H / 2 & "' fill='" & _Color & "' text-anchor='" & IF ( _Up, "start", "end" ) & "'>"
+				                & IF ( _Up, UNICHAR ( 9656 ), UNICHAR ( 9666 ) ) & "</text>",
+				            "<rect x='" & _Tip - _HeadW / 2 & "' y='" & ( _H - _HeadH ) / 2 & "' width='" & _HeadW & "' height='" & _HeadH & "' fill='" & _ColorText & "'/>"
+				        )
+				    )
+				VAR _Text =
+				    "<text x='" & _LabelX & "' y='" & _H / 2 & "' fill='" & _ColorText & "' text-anchor='" & _Anchor & "'>" & _Label & "</text>"
+				VAR _TextTotal =
+				    "<text x='" & _AxisX & "' y='" & _H / 2 & "' fill='" & _ColorText & "' text-anchor='middle' font-weight='bold'>" & _Label & "</text>"
+				VAR _SvgRow   = _Open & _Style & "/*SortBy:" & _Rank & "*/" & _AxisLine & _PinBar & _PinHead & _Text & "</svg>"
+				VAR _SvgTotal = _Open & _Style & _TextTotal & "</svg>"
+
+				RETURN
+				    IF ( _NoData, BLANK (), IF ( _IsRow, _SvgRow, _SvgTotal ) )
+				```
+			displayFolder: IBCS table
+			dataCategory: ImageUrl
+

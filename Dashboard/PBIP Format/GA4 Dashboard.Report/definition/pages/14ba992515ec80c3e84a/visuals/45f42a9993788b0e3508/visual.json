@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "45f42a9993788b0e3508",
   "position": {
-    "x": 289.811320754717,
-    "y": 667.60107816711593,
+    "x": 290.06134969325154,
+    "y": 666.99386503067478,
     "z": 2000,
-    "height": 376.49595687331532,
-    "width": 1095.8490566037735,
+    "height": 376.9325153374233,
+    "width": 1591.6564417177913,
     "tabOrder": 2000
   },
   "visual": {
@@ -44,6 +44,62 @@
               "queryRef": "#_Measures_.Total users",
               "nativeQueryRef": "Total users",
               "displayName": "Total users"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "KPI Label Delta"
+                }
+              },
+              "queryRef": "#_Measures_.KPI Label Delta",
+              "nativeQueryRef": "KPI Label Delta"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "KPI IBCS Bar"
+                }
+              },
+              "queryRef": "#_Measures_.KPI IBCS Bar",
+              "nativeQueryRef": "KPI IBCS Bar"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "KPI IBCS Pin"
+                }
+              },
+              "queryRef": "#_Measures_.KPI IBCS Pin",
+              "nativeQueryRef": "KPI IBCS Pin"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "#_Measures_"
+                    }
+                  },
+                  "Property": "KPI IBCS Variance"
+                }
+              },
+              "queryRef": "#_Measures_.KPI IBCS Variance",
+              "nativeQueryRef": "KPI IBCS Variance"
             }
           ],
           "fieldParameters": [
@@ -65,6 +121,109 @@
         }
       }
     },
+    "objects": {
+      "values": [
+        {
+          "properties": {
+            "fontColorPrimary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0.1
+                    }
+                  }
+                }
+              }
+            },
+            "fontColorSecondary": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0.1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "grid": [
+        {
+          "properties": {
+            "outlineColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#C8DCF7'"
+                    }
+                  }
+                }
+              }
+            },
+            "rowPadding": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "textSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
+            },
+            "imageHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "35D"
+                }
+              }
+            },
+            "imageWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "350D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "total": [
+        {
+          "properties": {
+            "totals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "columnHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "visualContainerObjects": {
       "title": [
         {
@@ -81,12 +240,28 @@
       ],
       "background": [
         {
-          "properties": {}
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
         }
       ],
       "border": [
         {
-          "properties": {}
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
         }
       ],
       "stylePreset": [

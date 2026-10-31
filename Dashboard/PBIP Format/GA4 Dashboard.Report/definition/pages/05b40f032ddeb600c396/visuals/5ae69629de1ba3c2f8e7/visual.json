@@ -2,11 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "5ae69629de1ba3c2f8e7",
   "position": {
-    "x": 294,
-    "y": 270.920245398773,
+    "x": 294.28571428571428,
+    "y": 284.28571428571428,
     "z": 1000,
-    "height": 356.319018404908,
-    "width": 1141.1042944785277
+    "height": 360,
+    "width": 1050,
+    "tabOrder": 18000
   },
   "visual": {
     "visualType": "lineChart",
@@ -124,6 +125,13 @@
                   "Value": "65D"
                 }
               }
+            },
+            "areaShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
             }
           }
         }
@@ -159,7 +167,7 @@
             "gridlineTransparency": {
               "expr": {
                 "Literal": {
-                  "Value": "0D"
+                  "Value": "35D"
                 }
               }
             },
@@ -178,6 +186,19 @@
                       "Value": "'#E8E8E8'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dataPoint": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "98D"
                 }
               }
             }
@@ -303,7 +324,7 @@
             "right": {
               "expr": {
                 "Literal": {
-                  "Value": "20D"
+                  "Value": "15D"
                 }
               }
             },

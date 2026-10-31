@@ -22,3 +22,8 @@ relationship fact_sessions_date_key_dim_date_date_key
 	fromColumn: fact_sessions.date_key
 	toColumn: dim_date.date_key
 
+relationship 8e0a802e-91ac-570c-885b-a1a606df459c
+	toCardinality: many
+	fromColumn: fact_events.geo_key
+	toColumn: dim_geo.geo_key
+

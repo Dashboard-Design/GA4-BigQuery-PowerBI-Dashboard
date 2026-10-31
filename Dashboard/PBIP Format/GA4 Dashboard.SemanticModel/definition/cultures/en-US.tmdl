@@ -54,19 +54,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "Ecommerce purchases"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "Ecommerce purchases": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.ecvr": {
 			      "Definition": {
@@ -75,19 +63,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "ECVR"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "ECVR": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.purchase_revenue": {
 			      "Definition": {
@@ -96,19 +72,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "Purchase revenue"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "Purchase revenue": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.total_users_yoy_": {
 			      "Definition": {
@@ -117,19 +81,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "Total users YoY %"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Δ": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.of_users": {
 			      "Definition": {
@@ -138,19 +90,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "% of Users"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% of Users": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.new_users_yoy_": {
 			      "Definition": {
@@ -159,19 +99,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "New users YoY %"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Δ": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.new_users1": {
 			      "Definition": {
@@ -180,19 +108,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "% New Users"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% New Users": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.ecommerce_purchases_yoy_": {
 			      "Definition": {
@@ -201,19 +117,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "Ecommerce purchases YoY %"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Δ": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.ecvr_yoy_": {
 			      "Definition": {
@@ -222,19 +126,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "ECVR YoY %"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Δ": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.purchase_revenue_yoy_": {
 			      "Definition": {
@@ -243,19 +135,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "Purchase revenue YoY %"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Δ": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.revenue": {
 			      "Definition": {
@@ -264,19 +144,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "% Revenue"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Revenue": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "table_measures_.revenue_yoy_": {
 			      "Definition": {
@@ -285,19 +153,7 @@ cultureInfo en-US
 			          "ConceptualProperty": "% Revenue YoY %"
 			        }
 			      },
-			      "State": "Generated",
-			      "Terms": [
-			        {
-			          "% Δ": {
-			            "State": "Suggested",
-			            "Source": {
-			              "Type": "External",
-			              "Agent": "PowerBI.VisualColumnRename"
-			            },
-			            "Weight": 0.9
-			          }
-			        }
-			      ]
+			      "State": "Generated"
 			    },
 			    "dim_traffic_source.traffic_source": {
 			      "Definition": {

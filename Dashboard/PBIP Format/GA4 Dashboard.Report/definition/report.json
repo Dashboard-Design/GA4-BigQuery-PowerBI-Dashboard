@@ -48,6 +48,9 @@
       }
     ]
   },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6865"
+  ],
   "resourcePackages": [
     {
       "name": "SharedResources",
@@ -70,13 +73,8 @@
           "type": "CustomTheme"
         },
         {
-          "name": "User_Acquisition-0-316918072258890293.png",
-          "path": "User_Acquisition-0-316918072258890293.png",
-          "type": "Image"
-        },
-        {
-          "name": "User_Acquisition-0-31734658868036798.png",
-          "path": "User_Acquisition-0-31734658868036798.png",
+          "name": "User_Acquisition-0-4003611274391151942.png",
+          "path": "User_Acquisition-0-4003611274391151942.png",
           "type": "Image"
         }
       ]
@@ -88,6 +86,7 @@
     "defaultDrillFilterOtherVisuals": true,
     "allowChangeFilterTypes": true,
     "useEnhancedTooltips": true,
+    "filterPaneHiddenInEditMode": true,
     "useDefaultAggregateDisplayName": true
   }
 }

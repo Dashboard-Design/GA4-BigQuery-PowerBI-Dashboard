@@ -2,11 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "bb1856b4e8847bc1cf05",
   "position": {
-    "x": 302.83435582822091,
-    "y": 674.35582822085883,
+    "x": 301.42857142857144,
+    "y": 674.28571428571433,
     "z": 2000,
-    "height": 369.57055214723925,
-    "width": 1132.2699386503068
+    "height": 367.14285714285717,
+    "width": 1042.8571428571429,
+    "tabOrder": 20000
   },
   "visual": {
     "visualType": "tableEx",
@@ -140,6 +141,13 @@
                   "Value": "12D"
                 }
               }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
             }
           }
         }
@@ -152,7 +160,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#C8DCF7'"
+                      "Value": "'#EFF6FF'"
                     }
                   }
                 }
@@ -209,6 +217,27 @@
               "expr": {
                 "Literal": {
                   "Value": "12D"
+                }
+              }
+            },
+            "columnAdjustment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'fixedWidth'"
+                }
+              }
+            },
+            "defaultColumnWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "90D"
+                }
+              }
+            },
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -335,7 +364,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "183.5503412805693D"
+                  "Value": "255.76914713443801D"
                 }
               }
             }
@@ -349,13 +378,69 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "246.32858154992826D"
+                  "Value": "263.81375227057026D"
                 }
               }
             }
           },
           "selector": {
             "metadata": "#_Measures_.KPI IBCS Variance"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "278.1558364446615D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "#_Measures_.KPI IBCS Bar"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "86D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "#_Measures_.Total users"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "117D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "#_Measures_.KPI Label Delta"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "92.69096005606167D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "#_Measures_.New users"
           }
         }
       ]

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "39f3c3fccef5f8d26b95",
   "position": {
-    "x": 1734.384236453202,
-    "y": 30.591133004926107,
-    "z": 4000,
+    "x": 1735,
+    "y": 38,
+    "z": 17500,
     "height": 39.901477832512313,
     "width": 159.60591133004925,
-    "tabOrder": 4000
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "actionButton",
@@ -153,6 +153,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'15'"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Show Walkthrough'"
                 }
               }
             }
@@ -381,6 +388,33 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualLink": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Bookmark'"
+                }
+              }
+            },
+            "bookmark": {
+              "expr": {
+                "Literal": {
+                  "Value": "'83ed486a132de7c571a0'"
                 }
               }
             }

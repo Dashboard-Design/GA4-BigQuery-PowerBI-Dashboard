@@ -1,0 +1,352 @@
+createOrReplace
+
+	ref table '#_Measures_'
+
+		/// Display name of the selected KPI.
+		measure 'KPI Name' = ```
+				SWITCH (
+				    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				    0, "Total users",
+				    1, "New users",
+				    2, "Ecommerce purchases",
+				    3, "ECVR",
+				    4, "Purchase revenue",
+				    "KPI"
+				)
+				```
+			displayFolder: HTML cards
+
+		/// Signed number format of the selected KPI (for change labels).
+		measure 'KPI Signed Format' = ```
+				SWITCH (
+				    SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ),
+				    3, "+0.00;-0.00;0.00",
+				    4, "+$#,0;-$#,0;$0",
+				    "+#,0;-#,0;0"
+				)
+				```
+			displayFolder: HTML cards
+
+		/// ECVR changes are shown in percentage points, so they are multiplied by 100.
+		measure 'KPI Signed Multiplier' = IF ( SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ) = 3, 100, 1 )
+			formatString: 0
+			displayFolder: HTML cards
+
+		/// Unit suffix of change labels (' pp' for ECVR).
+		measure 'KPI Signed Suffix' = IF ( SELECTEDVALUE ( 'KPI Selector'[KPI Selector Order] ) = 3, " pp", "" )
+			displayFolder: HTML cards
+
+		/// Engaged sessions / sessions.
+		measure 'Engagement rate' = ```
+				DIVIDE (
+				    CALCULATE ( COUNTROWS ( fact_sessions ), fact_sessions[is_engaged] = TRUE () ),
+				    [Sessions]
+				)
+				```
+			formatString: 0.0%
+			displayFolder: HTML cards
+
+		/// Purchase revenue / total users.
+		measure 'Revenue per user' = DIVIDE ( [Purchase revenue], [Total users] )
+			formatString: \$#,0.00
+			displayFolder: HTML cards
+
+		/// Share of all selected sessions that come from the source in the row (sums to 100%).
+		measure 'Sessions Share' = ```
+				DIVIDE (
+				    [Sessions],
+				    CALCULATE ( [Sessions], ALLSELECTED ( dim_traffic_source ) )
+				)
+				```
+			formatString: 0.0%
+			displayFolder: HTML cards
+
+		/// Row template for the 'What changed' card (one row per source).
+		measure 'HTML Movers Row' = ```
+				-- ROW template for the "What changed" card: one row per traffic source.
+				-- Visual fields: Context = dim_traffic_source[traffic_source], Values = this measure.
+				-- Sort the visual by THIS measure, descending (the HTML comment carries the sort key).
+				VAR _topN  = 5
+				VAR _avail = [KPI Comparison Available]
+				VAR _src   = SELECTEDVALUE ( dim_traffic_source[traffic_source], "(not set)" )
+				VAR _srcHtml = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _src, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), "'", "&#39;" )
+				VAR _chg    = [KPI Value] - COALESCE ( [KPI Comparison], 0 )
+				VAR _abs    = ABS ( _chg )
+				VAR _maxAbs =
+				    MAXX (
+				        ALLSELECTED ( dim_traffic_source[traffic_source] ),
+				        ABS ( [KPI Value] - COALESCE ( [KPI Comparison], 0 ) )
+				    )
+				VAR _rank =
+				    RANKX (
+				        ALLSELECTED ( dim_traffic_source[traffic_source] ),
+				        ABS ( [KPI Value] - COALESCE ( [KPI Comparison], 0 ) ),
+				        ,
+				        DESC,
+				        DENSE
+				    )
+				VAR _half  = DIVIDE ( _abs, _maxAbs ) * 50
+				VAR _up    = _chg >= 0
+				VAR _cls   = IF ( _up, "up", "down" )
+				VAR _left  = IF ( _up, 50, 50 - _half )
+				VAR _chgText = FORMAT ( _chg * [KPI Signed Multiplier], [KPI Signed Format] ) & [KPI Signed Suffix]
+				VAR _pct     = [KPI Delta]
+				VAR _pctText = IF ( ISBLANK ( _pct ), "new", FORMAT ( _pct, "+0%;-0%;0%" ) )
+				VAR _sortKey = FORMAT ( ROUND ( DIVIDE ( _abs, _maxAbs ) * 1000000, 0 ), "0000000" )
+				RETURN
+				    IF (
+				        _avail && _abs > 0 && _rank <= _topN,
+				        "<!--" & _sortKey & "-->"
+				            & "<div class='mv'>"
+				            & "<div class='mv-name' title='" & _srcHtml & "'>" & _srcHtml & "</div>"
+				            & "<div class='mv-bar'><span class='mv-axis'></span>"
+				            & "<span class='mv-fill " & _cls & "' style='left:" & _left & "%;width:" & _half & "%'></span></div>"
+				            & "<div class='mv-val " & _cls & "'>" & _chgText & "</div>"
+				            & "<div class='mv-pct'>" & _pctText & "</div>"
+				            & "</div>"
+				    )
+				```
+			displayFolder: HTML cards
+
+		/// Body template for the 'What changed' card (contains {{content}}).
+		measure 'HTML Movers Body' = ```
+				-- BODY template for the "What changed" card. Bind it to the visual's Body template (fx > Field value).
+				-- Contains the {{content}} placeholder where the visual inserts the rows.
+				VAR _name  = [KPI Name]
+				VAR _avail = [KPI Comparison Available]
+				VAR _pct   = [KPI Delta]
+				VAR _chg   = [KPI Value] - COALESCE ( [KPI Comparison], 0 )
+				VAR _up    = _chg >= 0
+				VAR _cls   = IF ( _up, "up", "down" )
+				VAR _arrow = IF ( _up, "&#9650;", "&#9660;" )
+				VAR _chgText = FORMAT ( _chg * [KPI Signed Multiplier], [KPI Signed Format] ) & [KPI Signed Suffix]
+
+				-- Biggest drag and biggest lift across sources
+				VAR _t =
+				    ADDCOLUMNS (
+				        ALLSELECTED ( dim_traffic_source[traffic_source] ),
+				        "@chg", [KPI Value] - COALESCE ( [KPI Comparison], 0 )
+				    )
+				VAR _drag = TOPN ( 1, FILTER ( _t, [@chg] < 0 ), [@chg], ASC )
+				VAR _lift = TOPN ( 1, FILTER ( _t, [@chg] > 0 ), [@chg], DESC )
+				VAR _dragName = MAXX ( _drag, dim_traffic_source[traffic_source] )
+				VAR _liftName = MAXX ( _lift, dim_traffic_source[traffic_source] )
+				VAR _dragNameH = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _dragName, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), "'", "&#39;" )
+				VAR _liftNameH = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _liftName, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), "'", "&#39;" )
+				VAR _dragText = FORMAT ( MAXX ( _drag, [@chg] ) * [KPI Signed Multiplier], [KPI Signed Format] ) & [KPI Signed Suffix]
+				VAR _liftText = FORMAT ( MAXX ( _lift, [@chg] ) * [KPI Signed Multiplier], [KPI Signed Format] ) & [KPI Signed Suffix]
+
+				VAR _hero =
+				    IF (
+				        _avail && NOT ISBLANK ( _pct ),
+				        "<div class='hero'><span class='hero-pct " & _cls & "'>" & _arrow & " " & FORMAT ( ABS ( _pct ), "0.0%" )
+				            & "</span><span class='hero-abs'>" & _chgText & " " & _name & "</span></div>",
+				        "<div class='hero'><span class='hero-na'>No comparison available for this range</span></div>"
+				    )
+				VAR _story =
+				    IF (
+				        NOT _avail,
+				        "The previous period starts before your first day of data, so there is nothing to compare with.",
+				        IF ( ISBLANK ( _dragName ), "No source declined. ", "Biggest drag: <b>" & _dragNameH & "</b> (" & _dragText & "). " )
+				            & IF ( ISBLANK ( _liftName ), "No source grew.", "Biggest lift: <b>" & _liftNameH & "</b> (" & _liftText & ")." )
+				    )
+
+				RETURN
+				    "<div class='card'>"
+				        & "<div class='card-head'><div class='card-title'>What changed</div>"
+				        & "<div class='card-sub'>" & _name & " &middot; " & [Period Range Label] & "</div></div>"
+				        & _hero
+				        & "<div class='story'>" & _story & "</div>"
+				        & "<div class='mv-head'><span>Source</span><span>Change vs previous period</span><span>Change</span><span>%</span></div>"
+				        & "<div class='mv-list'>{{content}}</div>"
+				        & "<div class='card-foot'>Compared with " & [Comparison Range Label] & " &middot; top 5 sources by absolute change</div>"
+				        & "</div>"
+				```
+			displayFolder: HTML cards
+
+		/// Stylesheet for the 'What changed' card.
+		measure 'HTML Movers CSS' = ```
+				"
+				#htmlContent {
+				  --primary: #0057CE;
+				  --secondary: #D51A9F;
+				  --ink: #041225;
+				  --muted: #64778F;
+				  --line: #E5E7EB;
+				  --track: #E6EDF8;
+				  --soft: #F3F6FA;
+				  font-family: 'Segoe UI', Arial, sans-serif;
+				  color: var(--ink);
+				  width: 100%;
+				  height: 100%;
+				  box-sizing: border-box;
+				  padding: 6px 8px;
+				  overflow: hidden;
+				}
+				.card { display: flex; flex-direction: column; height: 100%; gap: 8px; }
+				.card-title { font-size: 15px; font-weight: 600; }
+				.card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+				.card-foot { margin-top: auto; font-size: 10px; color: var(--muted); }
+				.htmlViewerEntry { margin: 0; padding: 0; }
+				.htmlViewerEntry:empty { display: none; }
+				.hero { display: flex; align-items: baseline; gap: 10px; }
+				.hero-pct { font-size: 30px; font-weight: 700; line-height: 1; }
+				.hero-pct.up { color: var(--primary); }
+				.hero-pct.down { color: var(--secondary); }
+				.hero-abs { font-size: 12px; color: var(--muted); }
+				.hero-na { font-size: 13px; color: var(--muted); }
+				.story { font-size: 12px; line-height: 1.45; background: var(--soft); border-left: 3px solid var(--primary); padding: 8px 10px; border-radius: 6px; }
+				.mv-head, .mv { display: grid; grid-template-columns: 1.25fr 1.5fr 0.8fr 0.55fr; column-gap: 8px; align-items: center; }
+				.mv-head { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 0 2px 4px; border-bottom: 1px solid var(--line); }
+				.mv-head span:nth-child(3), .mv-head span:nth-child(4), .mv-val, .mv-pct { text-align: right; }
+				.mv { height: 32px; font-size: 12px; border-bottom: 1px solid #F0F2F6; padding: 0 2px; }
+				.mv-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+				.mv-bar { position: relative; height: 12px; }
+				.mv-axis { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; background: var(--muted); }
+				.mv-fill { position: absolute; top: 1px; bottom: 1px; border-radius: 3px; }
+				.mv-fill.up { background: var(--primary); }
+				.mv-fill.down { background: var(--secondary); }
+				.mv-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+				.mv-val.up { color: var(--primary); }
+				.mv-val.down { color: var(--secondary); }
+				.mv-pct { color: var(--muted); font-variant-numeric: tabular-nums; }
+				"
+				```
+			displayFolder: HTML cards
+
+		/// Row template for the 'Channel quality' card (one row per source).
+		measure 'HTML Quality Row' = ```
+				-- ROW template for the "Channel quality" card: one row per traffic source.
+				-- Visual fields: Context = dim_traffic_source[traffic_source], Values = this measure.
+				-- Sort the visual by THIS measure, descending (the HTML comment carries the sort key = sessions).
+				-- Verdict rules (edit the VARs): a source is "big" when its share of sessions is at least the equal share
+				-- (1 / number of active sources); it "converts" when its ECVR is at least the all-sources ECVR.
+				VAR _topN        = 5
+				VAR _minSessions = 100
+				VAR _src     = SELECTEDVALUE ( dim_traffic_source[traffic_source], "(not set)" )
+				VAR _srcHtml = SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( SUBSTITUTE ( _src, "&", "&amp;" ), "<", "&lt;" ), ">", "&gt;" ), "'", "&#39;" )
+				VAR _sessions = [Sessions]
+				VAR _share    = [Sessions Share]
+				VAR _maxShare = MAXX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [Sessions Share] )
+				VAR _eng      = [Engagement rate]
+				VAR _ecvr     = COALESCE ( [ECVR], 0 )
+				VAR _rpu      = COALESCE ( [Revenue per user], 0 )
+				VAR _bench    = CALCULATE ( [ECVR], ALLSELECTED ( dim_traffic_source ) )
+				VAR _active   = COUNTROWS ( FILTER ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [Sessions] > 0 ) )
+				VAR _rank     = RANKX ( ALLSELECTED ( dim_traffic_source[traffic_source] ), [Sessions], , DESC, DENSE )
+				VAR _isBig    = _share >= DIVIDE ( 1, _active )
+				VAR _converts = _ecvr >= _bench
+				VAR _verdict =
+				    IF (
+				        _sessions < _minSessions, "Low data",
+				        IF (
+				            _isBig,
+				            IF ( _converts, "Scale", "Fix funnel" ),
+				            IF ( _converts, "Hidden gem", "Monitor" )
+				        )
+				    )
+				VAR _vcls = SWITCH ( _verdict, "Scale", "scale", "Fix funnel", "fix", "Hidden gem", "gem", "mute" )
+				VAR _ecvrCls = IF ( _converts, "up", "down" )
+				VAR _shareText = IF ( _share < 0.005, "<1%", FORMAT ( _share, "0%" ) )
+				VAR _barW = ROUND ( DIVIDE ( _share, _maxShare ) * 100, 1 )
+				VAR _sortKey = FORMAT ( _sessions, "0000000000" )
+				RETURN
+				    IF (
+				        _sessions > 0 && _rank <= _topN,
+				        "<!--" & _sortKey & "-->"
+				            & "<div class='q'>"
+				            & "<div class='q-main'><div class='q-name' title='" & _srcHtml & "'>" & _srcHtml & "</div>"
+				            & "<div class='q-share'><span class='q-track'><span class='q-fill' style='width:" & _barW & "%'></span></span>"
+				            & "<em>" & _shareText & "</em></div></div>"
+				            & "<div class='q-num'>" & FORMAT ( _eng, "0%" ) & "</div>"
+				            & "<div class='q-num " & _ecvrCls & "'>" & FORMAT ( _ecvr, "0.00%" ) & "</div>"
+				            & "<div class='q-num'>" & FORMAT ( _rpu, "$#,0.00" ) & "</div>"
+				            & "<div class='q-pill " & _vcls & "'>" & _verdict & "</div>"
+				            & "</div>"
+				    )
+				```
+			displayFolder: HTML cards
+
+		/// Body template for the 'Channel quality' card (contains {{content}}).
+		measure 'HTML Quality Body' = ```
+				-- BODY template for the "Channel quality" card. Bind it to the visual's Body template (fx > Field value).
+				-- Contains the {{content}} placeholder where the visual inserts the rows.
+				VAR _bEng  = [Engagement rate]
+				VAR _bEcvr = [ECVR]
+				VAR _bRpu  = [Revenue per user]
+				VAR _bSess = [Sessions]
+				RETURN
+				    "<div class='card'>"
+				        & "<div class='card-head'><div class='card-title'>Channel quality</div>"
+				        & "<div class='card-sub'>Do the sources that bring volume also bring buyers? &middot; " & [Period Range Label] & "</div></div>"
+				        & "<div class='bench'>"
+				        & "<div><span>Sessions</span><b>" & FORMAT ( _bSess, "#,0" ) & "</b></div>"
+				        & "<div><span>Engaged</span><b>" & FORMAT ( _bEng, "0%" ) & "</b></div>"
+				        & "<div><span>ECVR</span><b>" & FORMAT ( _bEcvr, "0.00%" ) & "</b></div>"
+				        & "<div><span>$ / user</span><b>" & FORMAT ( _bRpu, "$#,0.00" ) & "</b></div>"
+				        & "</div>"
+				        & "<div class='q-head'><span>Source &middot; share of sessions</span><span>Engaged</span><span>ECVR</span><span>$ / user</span><span>Verdict</span></div>"
+				        & "<div class='q-list'>{{content}}</div>"
+				        & "<div class='legend'>"
+				        & "<span class='q-pill scale'>Scale</span> big and converts above average &nbsp; "
+				        & "<span class='q-pill fix'>Fix funnel</span> big but converts below average<br>"
+				        & "<span class='q-pill gem'>Hidden gem</span> small but converts &nbsp; "
+				        & "<span class='q-pill mute'>Monitor / Low data</span> small, or under 100 sessions"
+				        & "</div>"
+				        & "</div>"
+				```
+			displayFolder: HTML cards
+
+		/// Stylesheet for the 'Channel quality' card.
+		measure 'HTML Quality CSS' = ```
+				"
+				#htmlContent {
+				  --primary: #0057CE;
+				  --secondary: #D51A9F;
+				  --ink: #041225;
+				  --muted: #64778F;
+				  --line: #E5E7EB;
+				  --track: #E6EDF8;
+				  --soft: #F3F6FA;
+				  font-family: 'Segoe UI', Arial, sans-serif;
+				  color: var(--ink);
+				  width: 100%;
+				  height: 100%;
+				  box-sizing: border-box;
+				  padding: 6px 8px;
+				  overflow: hidden;
+				}
+				.card { display: flex; flex-direction: column; height: 100%; gap: 8px; }
+				.card-title { font-size: 15px; font-weight: 600; }
+				.card-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+				.card-foot { margin-top: auto; font-size: 10px; color: var(--muted); }
+				.htmlViewerEntry { margin: 0; padding: 0; }
+				.htmlViewerEntry:empty { display: none; }
+				.bench { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+				.bench div { background: var(--soft); border-radius: 8px; padding: 6px 8px; }
+				.bench span { display: block; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+				.bench b { font-size: 15px; font-weight: 600; }
+				.q-head, .q { display: grid; grid-template-columns: 1.7fr 0.6fr 0.65fr 0.65fr 0.95fr; column-gap: 8px; align-items: center; }
+				.q-head { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); padding: 0 2px 4px; border-bottom: 1px solid var(--line); }
+				.q-head span:nth-child(n+2):nth-child(-n+4) { text-align: right; }
+				.q-head span:nth-child(5) { text-align: right; }
+				.q { padding: 5px 2px; min-height: 34px; border-bottom: 1px solid #F0F2F6; }
+				.q-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+				.q-share { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+				.q-track { flex: 1; height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; display: block; }
+				.q-fill { display: block; height: 100%; background: var(--primary); border-radius: 3px; }
+				.q-share em { font-style: normal; font-size: 10px; color: var(--muted); min-width: 28px; text-align: right; }
+				.q-num { text-align: right; font-size: 12px; font-variant-numeric: tabular-nums; }
+				.q-num.up { color: var(--primary); font-weight: 600; }
+				.q-num.down { color: var(--secondary); font-weight: 600; }
+				.q-pill { justify-self: end; display: inline-block; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+				.q-pill.scale { background: var(--primary); color: #fff; }
+				.q-pill.fix { background: var(--secondary); color: #fff; }
+				.q-pill.gem { background: #EAF2FF; color: var(--primary); border: 1px solid var(--primary); }
+				.q-pill.mute { background: var(--soft); color: var(--muted); }
+				.legend { margin-top: auto; font-size: 10px; color: var(--muted); line-height: 1.9; }
+				.legend .q-pill { font-size: 9.5px; padding: 1px 6px; }
+				"
+				```
+			displayFolder: HTML cards
+

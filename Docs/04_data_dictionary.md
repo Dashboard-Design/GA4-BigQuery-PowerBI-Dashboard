@@ -2,6 +2,8 @@
 
 Star schema built on the GA4 BigQuery export, loaded into Power BI in **Import** mode.
 
+**New here?** Read **§0** first: it explains in plain English what each table is for, with one worked example. **§8** explains why `fact_events` has so many columns.
+
 **How to read this**
 - **Type** column = BigQuery type (Power BI maps it: STRING → Text, INT64 → Whole number, FLOAT64 → Decimal, DATE → Date, BOOL → True/False).
 - **Key**: `PK` primary key, `FK` foreign key (the column that carries a relationship), `—` none.
@@ -10,22 +12,119 @@ Star schema built on the GA4 BigQuery export, loaded into Power BI in **Import**
 
 ---
 
+## 0. Start here — the business picture
+
+### 0.1 Facts record what happened, dimensions describe it
+
+- A **fact table** is a log. One row is added every time something happens (a click, a visit, a product line in an order). You **count and sum** facts.
+- A **dimension table** is a lookup list. One row per *thing* (a day, a device type, a country, a product). You **slice and filter** by dimensions.
+
+| Question in plain English | Dimension that answers it |
+|---|---|
+| **When** did it happen? | `dim_date` |
+| **Who** did it (an anonymous visitor)? | `dim_user` |
+| On **what device**? | `dim_device` |
+| **Where** in the world? | `dim_geo` |
+| **How did they first find us** (Google, direct, a campaign)? | `dim_traffic_source` |
+| Which **product**? | `dim_item` |
+| Which **mobile app** version (apps only)? | `dim_app_info` |
+
+### 0.2 The three fact tables, explained with one visit
+
+The three fact tables are **the same activity seen at three levels of detail**: what the visitor *did* (events), the *visit* as a whole (session), and the *products* involved (items).
+
+**The visit:** user `U1`, on a mobile phone, arrives from google / organic on 5 Jan 2021, browses, puts a T-shirt and 2 mugs in the basket, and buys them (order T-1001, $50).
+
+**`fact_events` — one row per thing the visitor did (6 rows here)**
+
+| # | Time | `event_name` | What happened | `purchase_revenue_in_usd` |
+|---|---|---|---|---|
+| 1 | 10:00:00 | `session_start` | the visit begins | — |
+| 2 | 10:00:01 | `page_view` | opened the store page | — |
+| 3 | 10:01:20 | `view_item` | looked at the Google Tee | — |
+| 4 | 10:02:05 | `add_to_cart` | added 1 Google Tee | — |
+| 5 | 10:03:30 | `add_to_cart` | added 2 Mugs | — |
+| 6 | 10:05:10 | `purchase` | paid for order T-1001 | **50.00** |
+
+**`fact_event_items` — one row per product inside an ecommerce event (5 rows here)**
+
+| Event | `item_name` | `quantity` | `price_in_usd` | `item_revenue_in_usd` |
+|---|---|---|---|---|
+| `view_item` | Google Tee | 1 | 20 | — |
+| `add_to_cart` | Google Tee | 1 | 20 | — |
+| `add_to_cart` | Mug | 2 | 15 | — |
+| `purchase` | Google Tee | 1 | 20 | 20 |
+| `purchase` | Mug | 2 | 15 | 30 |
+
+**`fact_sessions` — one row for the whole visit (1 row here)**
+
+| `user_key` | `session_id` | `date_key` | `event_count` | `session_duration_seconds` | `is_engaged` | `has_purchase` | `session_revenue_usd` | `entrance_page` |
+|---|---|---|---|---|---|---|---|---|
+| U1 | 1609840800 | 2021-01-05 | 6 | 310 | true | true | 50.00 | /store |
+
+**What the model reports for this single visit**
+
+| Measure | Value | Where it comes from |
+|---|---|---|
+| Total users | 1 | distinct `user_key` in `fact_events` |
+| Sessions | 1 | rows in `fact_sessions` |
+| Ecommerce purchases | 1 | `fact_events` rows named `purchase` (row 6) |
+| Purchase revenue | $50 | sum of `purchase_revenue_in_usd` (only row 6 has a value) |
+| ECVR | 100% | 1 purchase ÷ 1 session |
+| Best-selling product | Mug $30, Tee $20 | only `fact_event_items` knows products |
+
+**Why three tables and not one?**
+- **Items are a different grain.** If you attached the 2 item rows to the purchase event, that single purchase would become 2 rows: *Ecommerce purchases = 2* and *Purchase revenue = $100*. Keeping items in their own table prevents this double counting. For the same reason the facts are **not** related to each other, only to shared dimensions.
+- **Sessions are not in the GA4 export.** GA4 only stores events, so the session table is built once by grouping events on `(user_key, session_id)`. That gives cheap, correct *Sessions*, *Engagement rate* and *Session duration* instead of expensive distinct counts in every measure.
+
+### 0.3 Which table answers which question
+
+| Business question | Table | Measure / column |
+|---|---|---|
+| How many people visited? | `fact_events` | `Total users` |
+| How many of them are new? | `fact_events` | `New users` |
+| How many visits were there? | `fact_sessions` | `Sessions` |
+| Are visits engaging? How long do they last? | `fact_sessions` | `Engagement rate`, `session_duration_seconds` |
+| Which page do visits start on? | `fact_sessions` | `entrance_page` |
+| How many orders, and how much revenue? | `fact_events` | `Ecommerce purchases`, `Purchase revenue` |
+| What share of visits end in a purchase? | `fact_events` + `fact_sessions` | `ECVR` = purchases ÷ sessions |
+| Where do people drop off (view → cart → buy)? | `fact_events` | count rows by `event_name` |
+| Which products sell, and in what quantity? | `fact_event_items` (+ `dim_item`) | `quantity`, `item_revenue_in_usd` |
+| Which source, device or country is better? | any fact | slice by `dim_traffic_source`, `dim_device`, `dim_geo` |
+| Did it go up or down vs before? | measures | `… (Comparison)` and `… Change %` |
+
+### 0.4 Key terms
+
+| Term | Meaning in this model |
+|---|---|
+| **Event** | One recorded interaction (page view, add to cart, purchase…). |
+| **User** | An anonymous browser/device id (`user_pseudo_id`), **not a person**. The same person on a phone and a laptop counts as 2 users. |
+| **New user** | A user whose first-ever event was recorded (`first_visit` / `first_open`). |
+| **Session** | One visit: the events of one user between arriving and leaving. GA4 ends a session after 30 minutes of inactivity by default. |
+| **Engaged session** | A session that lasted 10 seconds or more, had a conversion, or had at least 2 page/screen views (GA4's definition). |
+| **ECVR** | Ecommerce conversion rate in this model: purchases ÷ sessions. |
+| **First-touch source** | How the user was *first* acquired. It stays with the user for life; it is **not** the source of the current visit. |
+| **Previous period** | The same number of days immediately before the selected date range. |
+| **Grain** | What one row of a table means (e.g. "one event"). Never mix grains in one table. |
+
+---
+
 ## 1. Model at a glance
 
-| Table | Role | Grain (one row per…) | Primary key | Built from (BigQuery) |
-|---|---|---|---|---|
-| `fact_events` | **Fact** | GA4 event | `event_id` | `flatten_events` → physical table |
-| `fact_sessions` | **Fact** | session | `user_key` + `session_id` (composite) | view over `fact_events` |
-| `fact_event_items` | **Fact** | item line within an event | none guaranteed (`event_id` + `item_id` identifies a line) | view over `flatten_event_items` |
-| `dim_date` | **Dimension** | calendar day | `date_key` | generated calendar; marked as the model's Date table |
-| `dim_device` | **Dimension** | device combination | `device_key` | rebuilt from `fact_events` |
-| `dim_geo` | **Dimension** | continent/country/region/city combination | `geo_key` | rebuilt from `fact_events` |
-| `dim_traffic_source` | **Dimension** | first-touch source/medium/campaign combination | `traffic_source_key` | rebuilt from `fact_events` |
-| `dim_app_info` | **Dimension** | app id + version | `app_info_key` | rebuilt from `fact_events` (empty for web-only data) |
-| `dim_item` | **Dimension** | product | `item_key` | rebuilt from `flatten_event_items` |
-| `dim_user` | **Dimension** | user (device/browser id) | `user_key` | rebuilt from `fact_events` |
-| `KPI Selector` | Parameter (disconnected) | selectable KPI | `KPI Selector Order` | calculated table (field parameter) |
-| `#_Measures_` | Measure container | — (no columns) | — | DAX measures only |
+| Table | Role | Grain (one row per…) | Primary key | What it is for (business purpose) | Built from (BigQuery) |
+|---|---|---|---|---|---|
+| `fact_events` | **Fact** | GA4 event | `event_id` | The activity log: users, purchases, revenue, funnels | `flatten_events` → physical table |
+| `fact_sessions` | **Fact** | session | `user_key` + `session_id` (composite) | Visits: sessions, engagement, duration, landing pages | view over `fact_events` |
+| `fact_event_items` | **Fact** | item line within an event | none guaranteed (`event_id` + `item_id` identifies a line) | Products inside ecommerce events: what is viewed, carted, sold | view over `flatten_event_items` |
+| `dim_date` | **Dimension** | calendar day | `date_key` | Filter and group by day, week, month; compare periods | generated calendar; marked as the model's Date table |
+| `dim_device` | **Dimension** | device combination | `device_key` | Desktop vs mobile vs tablet, browser, OS | rebuilt from `fact_events` |
+| `dim_geo` | **Dimension** | continent/country/region/city combination | `geo_key` | Where visitors are | rebuilt from `fact_events` |
+| `dim_traffic_source` | **Dimension** | first-touch source/medium/campaign combination | `traffic_source_key` | How users first found the site (and channel group) | rebuilt from `fact_events` |
+| `dim_app_info` | **Dimension** | app id + version | `app_info_key` | Mobile app versions (apps only) | rebuilt from `fact_events` (empty for web-only data) |
+| `dim_item` | **Dimension** | product | `item_key` | Product catalogue: name, brand, category | rebuilt from `flatten_event_items` |
+| `dim_user` | **Dimension** | user (device/browser id) | `user_key` | First/last seen, lifetime value per user | rebuilt from `fact_events` |
+| `KPI Selector` | Parameter (disconnected) | selectable KPI | `KPI Selector Order` | Lets the report user pick which KPI the page shows | calculated table (field parameter) |
+| `#_Measures_` | Measure container | — (no columns) | — | Holds every DAX measure in one place | DAX measures only |
 
 Sample data loaded: **1 Nov 2020 – 31 Jan 2021**; at last check `fact_events` had 4,295,584 rows and `fact_sessions` 360,129 rows.
 
@@ -176,7 +275,15 @@ erDiagram
 
 ### 4.1 `fact_events` — Fact · grain: one row per GA4 event · PK: `event_id`
 
-The atomic table of the whole model. 66 columns.
+**Business meaning.** The activity log of the website: every interaction GA4 records (page views, product views, add to cart, purchases…). With this table alone you can already answer "how many users, how many purchases, how much revenue".
+
+**Example.** One visitor who browses and buys produces about 6 rows (see §0.2).
+
+**Use it for:** `Total users`, `New users`, `Ecommerce purchases`, `Purchase revenue`, funnels by `event_name`.
+
+**Watch out.** Revenue columns are filled only on purchase events (NULL elsewhere), so summing them is safe, but *counting rows* without filtering `event_name` counts **all** events, not purchases. It has 66 columns on purpose in BigQuery; see §8 before importing them all into Power BI.
+
+The atomic table of the whole model. 66 columns (§8 explains why it is so wide and which columns Power BI really needs).
 
 **Keys and time**
 
@@ -293,6 +400,14 @@ The atomic table of the whole model. 66 columns.
 
 ### 4.2 `fact_sessions` — Fact · grain: one row per session · PK: `user_key` + `session_id`
 
+**Business meaning.** One row per **visit**. It answers "how many visits, how engaging were they, how long did they last, where did they start, did they end in a purchase".
+
+**Example.** The 6 events of user U1 on 5 Jan become one row: `event_count` 6, `session_duration_seconds` 310, `has_purchase` true, `session_revenue_usd` 50, `entrance_page` /store.
+
+**Use it for:** `Sessions`, `Engagement rate`, the denominator of `ECVR`, landing-page analysis.
+
+**Watch out.** `session_id` is only unique together with `user_key`. A session that runs past midnight stays one row, dated by the day it started.
+
 Derived (GA4 has no native session table) by grouping `fact_events` on `(user_key, session_id)`. Sessions that span midnight stay as one row, dated by the day they started. 14 columns.
 
 | Column | Type | Key | Description |
@@ -315,6 +430,14 @@ Derived (GA4 has no native session table) by grouping `fact_events` on `(user_ke
 ---
 
 ### 4.3 `fact_event_items` — Fact · grain: one row per item per event · PK: none guaranteed
+
+**Business meaning.** The **products inside** ecommerce events (`view_item`, `add_to_cart`, `purchase`…). One order with 3 products is 1 row in `fact_events` and 3 rows here.
+
+**Example.** An order of 1 Tee ($20) and 2 Mugs ($30) gives two item rows with `item_revenue_in_usd` 20 and 30.
+
+**Use it for:** best sellers, revenue by category or brand, what gets added to cart but not bought, coupon usage.
+
+**Watch out.** Never add `item_revenue_in_usd` to `purchase_revenue_in_usd` (same money, two grains). Only ecommerce events have item rows. It is not related to `fact_events` on purpose (§2 rules).
 
 Only ecommerce events (`view_item`, `add_to_cart`, `purchase`, …) have rows. GA4 does not guarantee that `event_id` + `item_id` is unique.
 
@@ -343,6 +466,10 @@ Only ecommerce events (`view_item`, `add_to_cart`, `purchase`, …) have rows. G
 
 ### 4.4 `dim_date` — Dimension · grain: one row per day · PK: `date_key`
 
+**Business meaning.** The calendar. It lets the report filter by date range, group by day/week/month, and shift dates to compare with the previous period.
+
+**Example.** Selecting 18–31 Jan in the date slicer filters every fact through this table; the comparison measures then look at the 14 days before 18 Jan.
+
 Marked as the model's **Date table** (required for time-intelligence functions). Covers 2020-01-01 to the end of next year.
 
 | Column | Type | Key | Description |
@@ -357,6 +484,10 @@ Marked as the model's **Date table** (required for time-intelligence functions).
 | `is_weekend` | BOOL | — | True for Saturday and Sunday. |
 
 ### 4.5 `dim_device` — Dimension · grain: one row per device combination · PK: `device_key`
+
+**Business meaning.** What kind of device the visitor used (desktop, mobile, tablet), plus OS and browser.
+
+**Example.** The Device slicer filters the whole page to mobile only, to see whether mobile visitors convert worse than desktop.
 
 | Column | Type | Key | Description |
 |---|---|---|---|
@@ -374,6 +505,10 @@ Marked as the model's **Date table** (required for time-intelligence functions).
 
 ### 4.6 `dim_geo` — Dimension · grain: one row per location combination · PK: `geo_key`
 
+**Business meaning.** Where in the world the visitor was (continent, country, region, city).
+
+**Example.** The Country slicer narrows the page to one market; one row exists per country/region/city combination.
+
 | Column | Type | Key | Description |
 |---|---|---|---|
 | `geo_key` | STRING | PK | Hash of continent, country, region and city. |
@@ -386,6 +521,12 @@ Marked as the model's **Date table** (required for time-intelligence functions).
 
 ### 4.7 `dim_traffic_source` — Dimension · grain: one row per first-touch combination · PK: `traffic_source_key`
 
+**Business meaning.** **How the user was first acquired** (source, medium, campaign), and the channel group they fall into (Direct, Organic Search, Paid Search…).
+
+**Example.** `google / organic / (none)` is a user who first arrived through a Google search result. They keep this value even if they return later via an email link.
+
+**Watch out.** This is first-touch (user level), **not** the source of the current session.
+
 | Column | Type | Key | Description |
 |---|---|---|---|
 | `traffic_source_key` | STRING | PK | Hash of medium, campaign and source. |
@@ -395,6 +536,10 @@ Marked as the model's **Date table** (required for time-intelligence functions).
 | `first_user_default_channel_group` | STRING | — | GA4-style default channel group (Direct, Organic Search, Paid Search, Referral, Email, Organic Social, …) derived in SQL from source/medium/campaign. An approximation of Google's rules. *Repo version only — see §6.* |
 
 ### 4.8 `dim_app_info` — Dimension · grain: one row per app id + version · PK: `app_info_key`
+
+**Business meaning.** Which mobile app (and version) generated the event. Only used by app properties.
+
+**Example.** `com.example.shop` version 3.2. For a website-only property the table is empty by design.
 
 **Empty for web-only data** (including the sample dataset): `app_info_key` is NULL on every web event. It fills automatically for app properties.
 
@@ -409,6 +554,10 @@ Marked as the model's **Date table** (required for time-intelligence functions).
 
 ### 4.9 `dim_item` — Dimension · grain: one row per product · PK: `item_key`
 
+**Business meaning.** The product catalogue as seen in the events: one row per product with its latest name, brand, variant and category path.
+
+**Example.** `item_key` GGOEAAAA… → "Google Tee Black", brand Google, category Apparel / Men's.
+
 | Column | Type | Key | Description |
 |---|---|---|---|
 | `item_key` | STRING | PK | The product's `item_id`. |
@@ -418,6 +567,12 @@ Marked as the model's **Date table** (required for time-intelligence functions).
 | `item_category` … `item_category5` | STRING (5 columns) | — | Category hierarchy, level 1 to 5 (most recent). |
 
 ### 4.10 `dim_user` — Dimension · grain: one row per user · PK: `user_key`
+
+**Business meaning.** One row per anonymous visitor (browser/device), with the first and last day seen and the lifetime value GA4 reports.
+
+**Example.** A user first seen on 3 Nov and last seen on 20 Jan is a returning user; one seen on a single day never came back.
+
+**Watch out.** A user is a device, not a person. It is not used by the User Acquisition page, so its relationships are optional.
 
 Recomputed on every refresh, so lifetime value and last-seen date are always current.
 
@@ -433,6 +588,10 @@ Recomputed on every refresh, so lifetime value and last-seen date are always cur
 
 ### 4.11 `KPI Selector` — Parameter table (disconnected) · PK: `KPI Selector Order`
 
+**Business meaning.** A small helper table behind the KPI buttons at the top of the page. It stores *which KPIs exist*, not data.
+
+**Example.** Clicking the "ECVR" card selects order 3, and measures such as `KPI Value` switch to the ECVR formula, so the line chart and tables follow the click.
+
 A **field parameter**: it powers the KPI button slicer and the line chart. 5 rows, no relationships.
 
 | Column | Type | Key | Description |
@@ -442,6 +601,8 @@ A **field parameter**: it powers the KPI button slicer and the line chart. 5 row
 | `KPI Selector Order` | Whole number | PK | 0–4. Measures such as `KPI Value` switch on this number. |
 
 ### 4.12 `#_Measures_` — Measure container
+
+**Business meaning.** A tidy home for all measures, so they do not sit scattered across data tables. It has no data of its own.
 
 No columns and no data; it only holds measures (§5).
 
@@ -530,3 +691,52 @@ ROW (
     "dim_geo keys", DISTINCTCOUNT ( dim_geo[geo_key] )
 )
 ```
+
+---
+
+## 8. Design note: why `fact_events` has 66 columns
+
+**Short answer.** `fact_events` is the *flattened GA4 event log*. Besides the event itself it carries (a) the keys to every dimension, (b) a **copy of the descriptive attributes of those dimensions**, and (c) the ecommerce, page and user fields that sit on each event. The dimension tables are rebuilt *from* these copies, which is why device, geo, app and traffic-source attributes are repeated on the fact.
+
+**Is that appropriate?** It depends on the layer.
+
+| Layer | Wide fact table? | Why |
+|---|---|---|
+| **BigQuery** (warehouse) | Fine, and normal | BigQuery is columnar: a query reads only the columns it names, so unused columns cost nothing. One wide event table is the usual way to model GA4. |
+| **Power BI** (semantic model, Import mode) | **Not ideal** | Every imported column is stored, compressed and refreshed. Text columns with many distinct values (`event_id`, `page_location`, `page_referrer`, `transaction_id`, `user_key`) are the most expensive. A lean fact means a smaller file, faster refresh and a cleaner field list. |
+
+There is also a usability risk: `fact_events[country]` sits next to `dim_geo[country]`. A slicer built on the fact copy filters only `fact_events`, not `fact_sessions`, and gives misleading numbers. The rule is: **always slice by the dimension table, never by the copy on the fact.**
+
+So the instinct "fact tables should be lean in columns" is right **for the Power BI model**. The 66 columns are best kept in BigQuery and only a subset imported.
+
+**The 66 columns by group, and what to import**
+
+| Group | Columns | Examples | Import into Power BI? |
+|---|---|---|---|
+| Keys | 7 | `event_id`, `date_key`, `user_key`, `device_key`, `geo_key`, `traffic_source_key`, `app_info_key` | Keep `date_key`, `user_key`, `device_key`, `geo_key`, `traffic_source_key`. Drop `event_id` (millions of unique strings, not used by any measure) and `app_info_key` for web-only data. |
+| Event and timing | 6 | `event_name`, `event_timestamp`, `event_value_in_usd`, `event_bundle_sequence_id` | Keep `event_name`. The rest only when a page needs them. |
+| Ecommerce | 11 | `purchase_revenue_in_usd`, `transaction_id`, refund / shipping / tax values | Keep `purchase_revenue_in_usd`. Add the others when you build the Ecommerce page. |
+| Page and session | 8 | `page_location`, `session_number`, `engagement_time_msec`, `session_engaged` | Add when you build Pages & Screens or Engagement pages. |
+| **Copies of dimension attributes** | **24** (device 10, geo 6, app 5, traffic source 3) | `device_category`, `country`, `traffic_source`… | **Drop.** Use the dimension tables. |
+| User and consent | 7 | `user_id`, `user_ltv_*`, consent flags | Drop (lifetime value is already in `dim_user`). |
+| Stream and platform | 3 | `stream_id`, `platform`, `hostname` | Optional; `platform` / `hostname` help when one property has several sites. |
+
+**What the current User Acquisition page actually uses from `fact_events`:** `date_key`, `user_key`, `event_name`, `purchase_revenue_in_usd`, plus `device_key`, `geo_key` and `traffic_source_key` for the relationships. A starter lean fact is therefore about **7 columns** instead of 66.
+
+**How to slim it down (pick one)**
+1. **In Power BI:** Power Query → *Choose Columns* on `fact_events`. Hiding columns is not enough, because hidden columns are still loaded.
+2. **In BigQuery:** create a lean view and import that instead (keep the wide table for analysis and for rebuilding the dimensions):
+
+```sql
+CREATE OR REPLACE VIEW `<PROJECT_ID>.<DATASET>.fact_events_pbi` AS
+SELECT
+  date_key, event_name, user_key,
+  device_key, geo_key, traffic_source_key,
+  purchase_revenue_in_usd, transaction_id,
+  engagement_time_msec, session_number
+FROM `<PROJECT_ID>.<DATASET>.fact_events`;
+```
+
+**To measure the saving** before and after, use VertiPaq Analyzer (DAX Studio → *Advanced → View Metrics*). It lists the size of every column.
+
+The same idea applies, on a smaller scale, to `fact_event_items`: its product name, brand, variant and five category columns also exist in `dim_item`, so a lean version would keep only `item_id`, `date_key`, `quantity` and the price/revenue columns.
